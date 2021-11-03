@@ -10,16 +10,16 @@ private typealias Input = Substring.UTF8View
 // [1]     document     ::=     prolog element Misc*
 
 private struct Document: Equatable {
-  var header: Void // Prolog
-  var root: Void // Element
-  var misc: Void // Misc
+  var header: String // Prolog
+  var root: String // Element
+  var misc: String // Misc
 }
 
-private let document = ()
+private let document = "document"
 
-private let prolog = ()
+private let prolog = "prolog"
 
-private let element = ()
+private let element = "element"
 
 // MARK: - Character Range
 
@@ -34,6 +34,7 @@ private func isLegalCharacter(_ s: UnicodeScalar) -> Bool {
 // MARK: - White Space
 
 // https://www.w3.org/TR/xml/#NT-S
+
 // [3]     S     ::=     (#x20 | #x9 | #xD | #xA)+
 
 // S == WhiteSpace()
@@ -41,6 +42,7 @@ private func isLegalCharacter(_ s: UnicodeScalar) -> Bool {
 // MARK: - Names and Tokens
 
 // https://www.w3.org/TR/xml/#NT-NameStartChar
+
 // [4]     NameStartChar     ::=     ":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
 
 private func isNameStartCharacter(_ s: UnicodeScalar) -> Bool {
@@ -76,6 +78,7 @@ private let name = Parse {
 // MARK: - Literals
 
 // https://www.w3.org/TR/xml/#NT-EntityValue
+
 // [9]     EntityValue     ::=     '"' ([^%&"] | PEReference | Reference)* '"' |  "'" ([^%&'] | PEReference | Reference)* "'"
 
 // TODO: References
@@ -100,10 +103,10 @@ private func isAttributeValueCharacter(_ s: UnicodeScalar) -> Bool {
 }
 
 // [11]     SystemLiteral     ::=     ('"' [^"]* '"') | ("'" [^']* "'")
-//private let systemLiteral = OneOf {
-//  doubleQuotedLiteral()
-//  singleQuotedLiteral()
-//}
+private let systemLiteral = OneOf {
+  doubleQuotedLiteral()
+  singleQuotedLiteral()
+}
 
 // [12]     PubidLiteral     ::=     '"' PubidChar* '"' | "'" (PubidChar - "'")* "'"
 // [13]     PubidChar     ::=     #x20 | #xD | #xA | [a-zA-Z0-9] | [-'()+,./:=?;!*#@$_%]
@@ -120,40 +123,165 @@ private func isPubidCharacter(_ s: UnicodeScalar) -> Bool {
   }
 }
 
+private func doubleQuoted<P: Parser>(
+  @ParserBuilder _ build: () -> P
+) -> AnyParser<P.Input, P.Output> where P.Input == Input {
+  let upstream = build()
+  return Parse {
+    "\"".utf8
+    upstream
+    "\"".utf8
+  }.eraseToAnyParser()
+}
+
 private func doubleQuotedLiteral(
-  scalar predicate: @escaping (UnicodeScalar) -> Bool // = { _ in true }
+  scalar predicate: @escaping (UnicodeScalar) -> Bool = { _ in true }
 ) -> AnyParser<Input, String> {
-  AnyParser {
-    "\"".utf8
-    UTF8.prefix {
-      predicate($0) && $0 != "\""
-    }
-    "\"".utf8
+  doubleQuoted {
+    UTF8.prefix { predicate($0) && $0 != "\"" }
   }
+}
+
+private func singleQuoted<P: Parser>(
+  @ParserBuilder _ build: () -> P
+) -> AnyParser<P.Input, P.Output> where P.Input == Input {
+  let upstream = build()
+  return Parse {
+    "'".utf8
+    upstream
+    "'".utf8
+  }.eraseToAnyParser()
 }
 
 private func singleQuotedLiteral(
-  scalar predicate: @escaping (UnicodeScalar) -> Bool // = { _ in true }
+  scalar predicate: @escaping (UnicodeScalar) -> Bool = { _ in true }
 ) -> AnyParser<Input, String> {
-  AnyParser {
-    "'".utf8
-    UTF8.prefix {
-      predicate($0) && $0 != "'"
-    }
-    "'".utf8
+  singleQuoted {
+    UTF8.prefix { predicate($0) && $0 != "'" }
   }
 }
 
-
 // MARK: - Character Data and Markup
+
+// https://www.w3.org/TR/xml/#NT-CharData
+
 // [14]     CharData     ::=     [^<&]* - ([^<&]* ']]>' [^<&]*)
 
+private let characterData = UTF8.prefix(whileScalar: isCharacterDataCharacter, orUpTo: "]]>".utf8)
 
-//private let characterData = UTF8.prefix(whileScalar: isCharacterDataCharacter, orUpTo: "]]>".utf8)
-//
-//private func isCharacterDataCharacter(_ s: UnicodeScalar) -> Bool {
-//  s != "<" && s != "&"
-//}
+private func isCharacterDataCharacter(_ s: UnicodeScalar) -> Bool {
+  s != "<" && s != "&"
+}
+
+// MARK: - Comments
+
+// https://www.w3.org/TR/xml/#NT-Comment
+
+// [15]     Comment     ::=     '<!--' ((Char - '-') | ('-' (Char - '-')))* '-->'
+private let comment = Parse {
+  "<!--".utf8
+  UTF8.prefix(whileScalar: isLegalCharacter, orUpTo: "--".utf8)
+  "-->".utf8
+}
+
+// MARK: - Processing Instructions
+
+// https://www.w3.org/TR/xml/#NT-PI
+
+// [16]     PI     ::=     '<?' PITarget (S (Char* - (Char* '?>' Char*)))? '?>'
+// [17]     PITarget     ::=     Name - (('X' | 'x') ('M' | 'm') ('L' | 'l'))
+
+private struct ProcessingInstructions: Equatable {
+  var target: String
+  var instructions: String?
+}
+
+private let processingInstructions = Parse {
+  "<?".utf8
+  piTarget
+  Optionally {
+    Skip {
+      // TODO: What's the preferred way to do this? maybe add atLeast: atMost: or I could do let whiteSpace =
+      Whitespace().filter { !$0.isEmpty }
+    }
+    UTF8.prefix(whileScalar: isLegalCharacter, orUpTo: "?>".utf8)
+  }
+  "?>".utf8
+}.map(ProcessingInstructions.init)
+
+private let piTarget = name.filter { $0.lowercased() != "xml" }
+
+// MARK: - CDATA Sections
+
+// https://www.w3.org/TR/xml/#dt-cdsection
+
+// [18]     CDSect     ::=     CDStart CData CDEnd
+// [19]     CDStart     ::=     '<![CDATA['
+// [20]     CData     ::=     (Char* - (Char* ']]>' Char*))
+// [21]     CDEnd     ::=     ']]>'
+
+private let cDataSection = Parse {
+  "<![CDATA[".utf8
+  UTF8.prefix(whileScalar: isLegalCharacter, orUpTo: "]]>".utf8)
+  "]]>".utf8
+}
+
+// MARK: - Prolog and Document Type Declaration
+
+// https://www.w3.org/TR/xml/#sec-prolog-dtd
+
+//  [22]     prolog     ::=     XMLDecl? Misc* (doctypedecl Misc*)?
+//  [23]     XMLDecl     ::=     '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
+
+private let xmlDeclaration = Parse {
+  "<?xml".utf8
+  versionInfo
+}
+
+//  [24]     VersionInfo     ::=     S 'version' Eq ("'" VersionNum "'" | '"' VersionNum '"')
+
+private let versionInfo = Parse {
+  Skip {
+    Whitespace().filter { !$0.isEmpty }
+  }
+  "version".utf8
+  equalSign
+  OneOf {
+    singleQuoted { versionNumber }
+    doubleQuoted { versionNumber }
+  }
+}
+
+//  [25]     Eq     ::=     S? '=' S?
+
+private let equalSign = Parse {
+  Skip { Whitespace() }
+  "=".utf8
+  Skip { Whitespace() }
+}
+
+//  [26]     VersionNum     ::=     '1.' [0-9]+
+
+private let versionNumber = Parse {
+  "1.".utf8.map { "1." }
+  UTF8.prefix { "0"..."9" ~= $0 }
+}.map(+) // just keeping as string for now
+
+//  [27]     Misc     ::=     Comment | PI | S
+
+
+
+
+// MARK: - Encoding Declaration
+// https://www.w3.org/TR/xml/#NT-EncodingDecl
+
+
+// [80]     EncodingDecl     ::=     S 'encoding' Eq ('"' EncName '"' | "'" EncName "'" )
+// [81]     EncName     ::=     [A-Za-z] ([A-Za-z0-9._] | '-')*  /* Encoding name contains only Latin characters */
+
+
+private let encodingName = 
+
 
 // MARK: - Helpers
 
