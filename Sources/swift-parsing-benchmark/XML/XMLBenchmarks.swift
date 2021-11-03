@@ -45,23 +45,10 @@ private func isLegalCharacter(_ s: UnicodeScalar) -> Bool {
 
 private func isNameStartCharacter(_ s: UnicodeScalar) -> Bool {
   switch s {
-  case "_",
-       ":",
-       "\u{2c00}"..."\u{2fef}",
-       "\u{37f}"..."\u{1fff}",
-       "\u{200c}"..."\u{200d}",
-       "\u{370}"..."\u{37d}",
-       "\u{2070}"..."\u{218f}",
-       "\u{3001}"..."\u{d7ff}",
-       "\u{10000}"..."\u{effff}",
-       "\u{c0}"..."\u{d6}",
-       "\u{d8}"..."\u{f6}",
-       "\u{f8}"..."\u{2ff}",
-       "\u{f900}"..."\u{fdcf}",
-       "\u{fdf0}"..."\u{fffd}",
-       "a"..."z",
-       "A"..."Z":
-    return true
+  case "_", ":", "\u{2c00}"..."\u{2fef}", "\u{37f}"..."\u{1fff}", "\u{200c}"..."\u{200d}", "\u{370}"..."\u{37d}",
+       "\u{2070}"..."\u{218f}", "\u{3001}"..."\u{d7ff}", "\u{10000}"..."\u{effff}", "\u{c0}"..."\u{d6}",
+       "\u{d8}"..."\u{f6}", "\u{f8}"..."\u{2ff}", "\u{f900}"..."\u{fdcf}", "\u{fdf0}"..."\u{fffd}", "a"..."z",
+       "A"..."Z": return true
   default: return false
   }
 }
@@ -70,13 +57,7 @@ private func isNameStartCharacter(_ s: UnicodeScalar) -> Bool {
 private func isNameCharacter(_ s: UnicodeScalar) -> Bool {
   if isNameStartCharacter(s) { return true }
   switch s {
-  case "-",
-       ".",
-       "\u{203f}"..."\u{2040}",
-       "\u{0300}"..."\u{036f}",
-       "\u{b7}",
-       "0"..."9":
-    return true
+  case "-", ".", "\u{203f}"..."\u{2040}", "\u{0300}"..."\u{036f}", "\u{b7}", "0"..."9": return true
   default: return false
   }
 }
@@ -96,22 +77,39 @@ private let name = Parse {
 
 // https://www.w3.org/TR/xml/#NT-EntityValue
 // [9]     EntityValue     ::=     '"' ([^%&"] | PEReference | Reference)* '"' |  "'" ([^%&'] | PEReference | Reference)* "'"
-// [10]     AttValue     ::=     '"' ([^<&"] | Reference)* '"' |  "'" ([^<&'] | Reference)* "'"
-// [11]     SystemLiteral     ::=     ('"' [^"]* '"') | ("'" [^']* "'")
-// [12]     PubidLiteral     ::=     '"' PubidChar* '"' | "'" (PubidChar - "'")* "'"
-// [13]     PubidChar     ::=     #x20 | #xD | #xA | [a-zA-Z0-9] | [-'()+,./:=?;!*#@$_%]
+
 // TODO: References
+
+private let entityValue = OneOf {
+  doubleQuotedLiteral(scalar: isEntityValueCharacter)
+  singleQuotedLiteral(scalar: isEntityValueCharacter)
+}
 
 private func isEntityValueCharacter(_ s: UnicodeScalar) -> Bool {
   s != "%" && s != "&"
+}
+
+// [10]     AttValue     ::=     '"' ([^<&"] | Reference)* '"' |  "'" ([^<&'] | Reference)* "'"
+private let attributeValue = OneOf {
+  doubleQuotedLiteral(scalar: isAttributeValueCharacter)
+  singleQuotedLiteral(scalar: isAttributeValueCharacter)
 }
 
 private func isAttributeValueCharacter(_ s: UnicodeScalar) -> Bool {
   s != "<" && s != "&"
 }
 
-private func isSystemLiteralCharacter(_ s: UnicodeScalar) -> Bool {
-  true
+// [11]     SystemLiteral     ::=     ('"' [^"]* '"') | ("'" [^']* "'")
+//private let systemLiteral = OneOf {
+//  doubleQuotedLiteral()
+//  singleQuotedLiteral()
+//}
+
+// [12]     PubidLiteral     ::=     '"' PubidChar* '"' | "'" (PubidChar - "'")* "'"
+// [13]     PubidChar     ::=     #x20 | #xD | #xA | [a-zA-Z0-9] | [-'()+,./:=?;!*#@$_%]
+private let pubidLiteral = OneOf {
+  doubleQuotedLiteral(scalar: isPubidCharacter)
+  singleQuotedLiteral(scalar: isPubidCharacter)
 }
 
 private func isPubidCharacter(_ s: UnicodeScalar) -> Bool {
@@ -123,7 +121,7 @@ private func isPubidCharacter(_ s: UnicodeScalar) -> Bool {
 }
 
 private func doubleQuotedLiteral(
-  scalar predicate: @escaping (UnicodeScalar) -> Bool
+  scalar predicate: @escaping (UnicodeScalar) -> Bool // = { _ in true }
 ) -> AnyParser<Input, String> {
   AnyParser {
     "\"".utf8
@@ -134,8 +132,8 @@ private func doubleQuotedLiteral(
   }
 }
 
-private let singleQuotedLiteral(
-  scalar predicate: @escaping (UnicodeScalar) -> Bool
+private func singleQuotedLiteral(
+  scalar predicate: @escaping (UnicodeScalar) -> Bool // = { _ in true }
 ) -> AnyParser<Input, String> {
   AnyParser {
     "'".utf8
@@ -145,6 +143,17 @@ private let singleQuotedLiteral(
     "'".utf8
   }
 }
+
+
+// MARK: - Character Data and Markup
+// [14]     CharData     ::=     [^<&]* - ([^<&]* ']]>' [^<&]*)
+
+
+//private let characterData = UTF8.prefix(whileScalar: isCharacterDataCharacter, orUpTo: "]]>".utf8)
+//
+//private func isCharacterDataCharacter(_ s: UnicodeScalar) -> Bool {
+//  s != "<" && s != "&"
+//}
 
 // MARK: - Helpers
 
