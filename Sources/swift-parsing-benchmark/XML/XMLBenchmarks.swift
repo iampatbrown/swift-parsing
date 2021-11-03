@@ -200,16 +200,16 @@ private let processingInstructions = Parse {
   "<?".utf8
   piTarget
   Optionally {
-    Skip {
-      // TODO: What's the preferred way to do this? maybe add atLeast: atMost: or I could do let whiteSpace =
-      Whitespace().filter { !$0.isEmpty }
-    }
+    Skip { atLeastOneWhiteSpace }
     UTF8.prefix(whileScalar: isLegalCharacter, orUpTo: "?>".utf8)
   }
   "?>".utf8
 }.map(ProcessingInstructions.init)
 
 private let piTarget = name.filter { $0.lowercased() != "xml" }
+
+// TODO: What's the preferred way to do this? maybe add atLeast: atMost: or I could do let whiteSpace =
+private let atLeastOneWhiteSpace = Whitespace().filter { !$0.isEmpty }
 
 // MARK: - CDATA Sections
 
@@ -241,9 +241,7 @@ private let xmlDeclaration = Parse {
 //  [24]     VersionInfo     ::=     S 'version' Eq ("'" VersionNum "'" | '"' VersionNum '"')
 
 private let versionInfo = Parse {
-  Skip {
-    Whitespace().filter { !$0.isEmpty }
-  }
+  Skip {    atLeastOneWhiteSpace  }
   "version".utf8
   equalSign
   OneOf {
@@ -269,19 +267,39 @@ private let versionNumber = Parse {
 
 //  [27]     Misc     ::=     Comment | PI | S
 
-
-
-
 // MARK: - Encoding Declaration
+
 // https://www.w3.org/TR/xml/#NT-EncodingDecl
 
-
 // [80]     EncodingDecl     ::=     S 'encoding' Eq ('"' EncName '"' | "'" EncName "'" )
+
+private let encodingDeclaration = Parse {
+  Skip { atLeastOneWhiteSpace }
+  "encoding".utf8
+  equalSign
+  OneOf {
+    doubleQuoted { encodingName }
+    singleQuoted { encodingName }
+  }
+}
+
 // [81]     EncName     ::=     [A-Za-z] ([A-Za-z0-9._] | '-')*  /* Encoding name contains only Latin characters */
+private let encodingName = Parse {
+  UTF8.prefix(1, whileScalar: isEncodingNameStartCharacter)
+  UTF8.prefix(whileScalar: isEncodingNameCharacter)
+}.map(+)
 
+private func isEncodingNameStartCharacter(_ s: UnicodeScalar) -> Bool {
+  "A"..."Z" ~= s || "a"..."z" ~= s
+}
 
-private let encodingName = 
-
+private func isEncodingNameCharacter(_ s: UnicodeScalar) -> Bool {
+  if isEncodingNameStartCharacter(s) { return true }
+  switch s {
+  case "_", "-", ".", "0"..."9": return true
+  default: return false
+  }
+}
 
 // MARK: - Helpers
 
