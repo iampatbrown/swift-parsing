@@ -17,7 +17,6 @@ private struct Document: Equatable {
 
 private let document = "document"
 
-private let prolog = "prolog"
 
 private let element = "element"
 
@@ -231,11 +230,21 @@ private let cDataSection = Parse {
 // https://www.w3.org/TR/xml/#sec-prolog-dtd
 
 //  [22]     prolog     ::=     XMLDecl? Misc* (doctypedecl Misc*)?
+private let prolog = Parse {
+  Optionally { xmlDeclaration }
+  Many { misc } separatedBy: { "utf8".utf8 }
+
+}
+
 //  [23]     XMLDecl     ::=     '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
 
 private let xmlDeclaration = Parse {
   "<?xml".utf8
   versionInfo
+  Optionally { encodingDeclaration }
+  Optionally { standaloneDocumentDeclaration }
+  Skip { Whitespace() }
+  "?>".utf8
 }
 
 //  [24]     VersionInfo     ::=     S 'version' Eq ("'" VersionNum "'" | '"' VersionNum '"')
@@ -266,9 +275,53 @@ private let versionNumber = Parse {
 }.map(+) // just keeping as string for now
 
 //  [27]     Misc     ::=     Comment | PI | S
+private enum Misc {
+  case comment(String)
+  case pi(ProcessingInstructions)
+  case whiteSpace
+}
+
+private let misc = OneOf {
+  comment.map(Misc.comment)
+  processingInstructions.map(Misc.pi)
+  atLeastOneWhiteSpace.map { _ in Misc.whiteSpace }
+}
+
+
+// MARK: - Document Type Definition
+// https://www.w3.org/TR/xml/#NT-doctypedecl
+
+
+// [28]     doctypedecl     ::=     '<!DOCTYPE' S Name (S ExternalID)? S? ('[' intSubset ']' S?)? '>' [VC: Root Element Type], [WFC: External Subset]
+// [28a]     DeclSep     ::=     PEReference | S  [WFC: PE Between Declarations]
+// [28b]     intSubset     ::=     (markupdecl | DeclSep)*
+// [29]     markupdecl     ::=     elementdecl | AttlistDecl | EntityDecl | NotationDecl | PI | Comment  [VC: Proper Declaration/PE Nesting] [WFC: PEs in Internal Subset]
+
+
+// MARK: - Standalone Document Declaration
+// https://www.w3.org/TR/xml/#NT-SDDecl
+
+// [32]     SDDecl     ::=     S 'standalone' Eq (("'" ('yes' | 'no') "'") | ('"' ('yes' | 'no') '"'))
+// Constraint: [VC: Standalone Document Declaration]
+
+private let standaloneDocumentDeclaration = Parse {
+  Skip { atLeastOneWhiteSpace }
+  "standalone".utf8
+  equalSign
+  OneOf {
+    singleQuoted { isStandalone }
+    doubleQuoted { isStandalone }
+  }
+}
+
+private let isStandalone = OneOf {
+  "yes".utf8.map { true }
+  "no".utf8.map { false }
+}
+
+
 
 // MARK: - Encoding Declaration
-
 // https://www.w3.org/TR/xml/#NT-EncodingDecl
 
 // [80]     EncodingDecl     ::=     S 'encoding' Eq ('"' EncName '"' | "'" EncName "'" )
