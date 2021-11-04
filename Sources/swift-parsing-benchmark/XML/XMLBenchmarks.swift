@@ -17,7 +17,6 @@ private struct Document: Equatable {
 
 private let document = "document"
 
-
 private let element = "element"
 
 // MARK: - Character Range
@@ -233,7 +232,6 @@ private let cDataSection = Parse {
 private let prolog = Parse {
   Optionally { xmlDeclaration }
   Many { misc } separatedBy: { "utf8".utf8 }
-
 }
 
 //  [23]     XMLDecl     ::=     '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
@@ -250,7 +248,7 @@ private let xmlDeclaration = Parse {
 //  [24]     VersionInfo     ::=     S 'version' Eq ("'" VersionNum "'" | '"' VersionNum '"')
 
 private let versionInfo = Parse {
-  Skip {    atLeastOneWhiteSpace  }
+  Skip { atLeastOneWhiteSpace }
   "version".utf8
   equalSign
   OneOf {
@@ -287,18 +285,42 @@ private let misc = OneOf {
   atLeastOneWhiteSpace.map { _ in Misc.whiteSpace }
 }
 
-
 // MARK: - Document Type Definition
+
 // https://www.w3.org/TR/xml/#NT-doctypedecl
 
-
 // [28]     doctypedecl     ::=     '<!DOCTYPE' S Name (S ExternalID)? S? ('[' intSubset ']' S?)? '>' [VC: Root Element Type], [WFC: External Subset]
+
+private let documentTypeDeclaration = Parse {
+  "<!DOCTYPE".utf8
+  Parse { // TODO: Extra Variadic or just extract it anyway?
+    Skip { atLeastOneWhiteSpace }
+    name
+    Optionally {
+      Skip { atLeastOneWhiteSpace }
+      externalId
+    }
+    Skip { Whitespace() }
+    Optionally {
+      "[".utf8
+      // TODO: intSubset
+      "]".utf8
+      Skip { Whitespace() }
+    }
+  }
+  ">".utf8
+}
+
 // [28a]     DeclSep     ::=     PEReference | S  [WFC: PE Between Declarations]
+
 // [28b]     intSubset     ::=     (markupdecl | DeclSep)*
+
 // [29]     markupdecl     ::=     elementdecl | AttlistDecl | EntityDecl | NotationDecl | PI | Comment  [VC: Proper Declaration/PE Nesting] [WFC: PEs in Internal Subset]
 
+// private let markupDeclaration =
 
 // MARK: - Standalone Document Declaration
+
 // https://www.w3.org/TR/xml/#NT-SDDecl
 
 // [32]     SDDecl     ::=     S 'standalone' Eq (("'" ('yes' | 'no') "'") | ('"' ('yes' | 'no') '"'))
@@ -319,9 +341,109 @@ private let isStandalone = OneOf {
   "no".utf8.map { false }
 }
 
+// MARK: - Element Type Declarations
 
+// https://www.w3.org/TR/xml/#NT-elementdecl
+
+// [45]     elementdecl     ::=     '<!ELEMENT' S Name S contentspec S? '>'  [VC: Unique Element Type Declaration]
+// [46]     contentspec     ::=     'EMPTY' | 'ANY' | Mixed | children
+
+private let elementDeclaration = Parse {
+  "<!ELEMENT".utf8
+  Parse {
+    Skip { atLeastOneWhiteSpace }
+    name
+    Skip { atLeastOneWhiteSpace }
+    contentSpecification
+    Skip { Whitespace() }
+  }
+  ">".utf8
+}
+
+private enum ContentSpecification {
+  case empty
+  case any
+  case mixed(elementNames: [String])
+}
+
+private let contentSpecification = OneOf {
+  "EMPTY".utf8.map { ContentSpecification.empty }
+  "ANY".utf8.map { ContentSpecification.any }
+  mixed
+}
+
+// MARK: - Element Content
+// https://www.w3.org/TR/xml/#NT-children
+
+
+// [47]     children     ::=     (choice | seq) ('?' | '*' | '+')?
+// [48]     cp     ::=     (Name | choice | seq) ('?' | '*' | '+')?
+// [49]     choice     ::=     '(' S? cp ( S? '|' S? cp )+ S? ')'  [VC: Proper Group/PE Nesting]
+// [50]     seq     ::=     '(' S? cp ( S? ',' S? cp )* S? ')'  [VC: Proper Group/PE Nesting]
+
+
+
+// MARK: - Mixed Content
+
+// https://www.w3.org/TR/xml/#NT-Mixed
+
+// [51]     Mixed     ::=     '(' S? '#PCDATA' (S? '|' S? Name)* S? ')*' | '(' S? '#PCDATA' S? ')'
+// [VC: Proper Group/PE Nesting] [VC: No Duplicate Types]
+
+
+
+private let mixed = OneOf {
+  Parse {
+    "(".utf8
+    Skip { atLeastOneWhiteSpace }
+    "#PCDATA".utf8
+    Many {
+      Skip { atLeastOneWhiteSpace }
+      "|".utf8
+      Skip { atLeastOneWhiteSpace }
+      name
+    }.map(ContentSpecification.mixed(elementNames:))
+    Skip { atLeastOneWhiteSpace }
+    ")*".utf8
+  }
+  Parse {
+    "(".utf8
+    Skip { atLeastOneWhiteSpace }
+    "#PCDATA".utf8
+    Skip { atLeastOneWhiteSpace }
+    ")".utf8
+  }.map { ContentSpecification.mixed(elementNames: []) }
+}
+
+// MARK: - External Entity Declaration
+
+// https://www.w3.org/TR/xml/#NT-ExternalID
+
+// [75]     ExternalID     ::=     'SYSTEM' S SystemLiteral | 'PUBLIC' S PubidLiteral S SystemLiteral
+// [76]     NDataDecl     ::=     S 'NDATA' S Name  [VC: Notation Declared]
+
+private enum ExternalID {
+  case system(String)
+  case `public`(String, String)
+}
+
+private let externalId = OneOf {
+  Parse {
+    "SYSTEM".utf8
+    Skip { atLeastOneWhiteSpace }
+    systemLiteral
+  }.map(ExternalID.system)
+  Parse {
+    "PUBLIC".utf8
+    Skip { atLeastOneWhiteSpace }
+    pubidLiteral
+    Skip { atLeastOneWhiteSpace }
+    systemLiteral
+  }.map(ExternalID.public)
+}
 
 // MARK: - Encoding Declaration
+
 // https://www.w3.org/TR/xml/#NT-EncodingDecl
 
 // [80]     EncodingDecl     ::=     S 'encoding' Eq ('"' EncName '"' | "'" EncName "'" )
