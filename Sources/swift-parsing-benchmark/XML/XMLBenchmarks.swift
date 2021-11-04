@@ -1,3 +1,4 @@
+import CloudKit
 import Parsing
 
 // MARK: - Parser
@@ -293,7 +294,7 @@ private let misc = OneOf {
 
 private let documentTypeDeclaration = Parse {
   "<!DOCTYPE".utf8
-  Parse { // TODO: Extra Variadic or just extract it anyway?
+  Parse { // TODO: Extra Variadic or just extract it?
     Skip { atLeastOneWhiteSpace }
     name
     Optionally {
@@ -315,9 +316,13 @@ private let documentTypeDeclaration = Parse {
 
 // [28b]     intSubset     ::=     (markupdecl | DeclSep)*
 
-// [29]     markupdecl     ::=     elementdecl | AttlistDecl | EntityDecl | NotationDecl | PI | Comment  [VC: Proper Declaration/PE Nesting] [WFC: PEs in Internal Subset]
+// [29]     markupdecl     ::=     elementdecl | AttlistDecl | EntityDecl | NotationDecl | PI | Comment
+// [VC: Proper Declaration/PE Nesting] [WFC: PEs in Internal Subset]
 
-// private let markupDeclaration =
+// TODO: WIP
+private let markupDeclaration = OneOf {
+  elementDeclaration
+}
 
 // MARK: - Standalone Document Declaration
 
@@ -360,28 +365,105 @@ private let elementDeclaration = Parse {
   ">".utf8
 }
 
-private enum ContentSpecification {
-  case empty
-  case any
-  case mixed(elementNames: [String])
-}
-
 private let contentSpecification = OneOf {
   "EMPTY".utf8.map { ContentSpecification.empty }
   "ANY".utf8.map { ContentSpecification.any }
   mixed
+  children
+}
+
+private enum ContentSpecification {
+  case empty
+  case any
+  case mixed(elementNames: [String])
+  case children(ContentParticle)
 }
 
 // MARK: - Element Content
+
 // https://www.w3.org/TR/xml/#NT-children
 
-
 // [47]     children     ::=     (choice | seq) ('?' | '*' | '+')?
+
+private let children = Parse {
+  OneOf {
+    oneOfElements.map(ContentParticle.Element.oneOf)
+    orderedElements.map(ContentParticle.Element.ordered)
+  }
+  particleCount
+}.map(ContentParticle.init)
+  .map(ContentSpecification.children)
+
 // [48]     cp     ::=     (Name | choice | seq) ('?' | '*' | '+')?
+
+private var contentParticle: AnyParser<Input, ContentParticle> {
+  Parse {
+    OneOf {
+      name.map(ContentParticle.Element.named)
+      oneOfElements.map(ContentParticle.Element.oneOf)
+      orderedElements.map(ContentParticle.Element.ordered)
+    }
+    particleCount
+  }
+  .map(ContentParticle.init)
+  .eraseToAnyParser()
+}
+
+private let particleCount = OneOf {
+  "?".utf8.map { ContentParticle.Count.zeroOrOne }
+  "*".utf8.map { ContentParticle.Count.zeroOrMore }
+  "+".utf8.map { ContentParticle.Count.oneOrMore }
+  Always(ContentParticle.Count.one) // TODO: Which would you do Always, nil coalescing or optional init?
+}
+
+private struct ContentParticle {
+  init(element: ContentParticle.Element, count: ContentParticle.Count) {
+    self.element = element
+    self.count = count
+  }
+
+  var element: Element
+  var count: Count
+
+  indirect enum Element {
+    case named(String)
+    case oneOf([ContentParticle]) // should be at least 2
+    case ordered([ContentParticle]) // at least one
+  }
+
+  enum Count {
+    case one
+    case oneOrMore // +
+    case zeroOrMore // *
+    case zeroOrOne // ?
+  }
+}
+
 // [49]     choice     ::=     '(' S? cp ( S? '|' S? cp )+ S? ')'  [VC: Proper Group/PE Nesting]
+private let oneOfElements = Parse {
+  "(".utf8
+  Many(atLeast: 2) {
+    Skip { Whitespace() }
+    contentParticle
+    Skip { Whitespace() }
+  } separatedBy: {
+    "|".utf8
+  }
+  ")".utf8
+}
+
 // [50]     seq     ::=     '(' S? cp ( S? ',' S? cp )* S? ')'  [VC: Proper Group/PE Nesting]
-
-
+private let orderedElements = Parse {
+  "(".utf8
+  Many(atLeast: 1) {
+    Skip { Whitespace() }
+    contentParticle
+    Skip { Whitespace() }
+  } separatedBy: {
+    ",".utf8
+  }
+  ")".utf8
+}
 
 // MARK: - Mixed Content
 
@@ -389,8 +471,6 @@ private let contentSpecification = OneOf {
 
 // [51]     Mixed     ::=     '(' S? '#PCDATA' (S? '|' S? Name)* S? ')*' | '(' S? '#PCDATA' S? ')'
 // [VC: Proper Group/PE Nesting] [VC: No Duplicate Types]
-
-
 
 private let mixed = OneOf {
   Parse {
@@ -402,10 +482,10 @@ private let mixed = OneOf {
       "|".utf8
       Skip { atLeastOneWhiteSpace }
       name
-    }.map(ContentSpecification.mixed(elementNames:))
+    }
     Skip { atLeastOneWhiteSpace }
     ")*".utf8
-  }
+  }.map(ContentSpecification.mixed)
   Parse {
     "(".utf8
     Skip { atLeastOneWhiteSpace }
