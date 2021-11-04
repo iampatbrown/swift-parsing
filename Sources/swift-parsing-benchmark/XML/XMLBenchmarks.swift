@@ -335,6 +335,12 @@ private let documentTypeDeclaration = Parse {
 // TODO: WIP
 private let markupDeclaration = OneOf {
   elementDeclaration
+  // attributeListDeclaration
+}
+
+private enum MarkupDeclaration {
+  case element
+  case attributeList
 }
 
 // MARK: - Standalone Document Declaration
@@ -513,15 +519,17 @@ private let mixed = OneOf {
 // https://www.w3.org/TR/xml/#NT-AttlistDecl
 
 // [52]     AttlistDecl     ::=     '<!ATTLIST' S Name AttDef* S? '>'
-// [53]     AttDef     ::=     S Name S AttType S DefaultDecl
 
-private let attributeListDeclarations = Parse {
+private let attributeListDeclaration = Parse {
   "<!ATTLIST".utf8
   Skip { atLeastOneWhiteSpace }
   name
+  Many { attributeDefinition }
   Skip { Whitespace() }
   ">".utf8
 }
+
+// [53]     AttDef     ::=     S Name S AttType S DefaultDecl
 
 private let attributeDefinition = Parse {
   Skip { atLeastOneWhiteSpace }
@@ -529,6 +537,7 @@ private let attributeDefinition = Parse {
   Skip { atLeastOneWhiteSpace }
   attributeType
   Skip { atLeastOneWhiteSpace }
+  attributeDefaults
 }
 
 // MARK: - Attribute Types
@@ -631,12 +640,105 @@ private let enumeration = Parse {
 
 // https://www.w3.org/TR/xml/#NT-DefaultDecl
 
+// [60]     DefaultDecl     ::=     '#REQUIRED' | '#IMPLIED' | (('#FIXED' S)? AttValue)
+// [VC: Required Attribute] [VC: Attribute Default Value Syntactically Correct] [WFC: No < in Attribute Values] [VC: Fixed Attribute Default] [WFC: No External Entity References]
+
+private let attributeDefaults = OneOf {
+  "#REQUIRED".utf8.map { AttributeDefaults.required }
+  "#IMPLIED".utf8.map { AttributeDefaults.implied }
+  fixedDefaultValue.map(AttributeDefaults.fixed)
+  attributeValue.map(AttributeDefaults.default)
+}
+
+private let fixedDefaultValue = Parse {
+  "#FIXED".utf8
+  Skip { atLeastOneWhiteSpace }
+  attributeValue
+}
+
+private enum AttributeDefaults {
+  case required
+  case implied
+  case fixed(String)
+  case `default`(String)
+}
+
+// MARK: - Entity Declarations
+
+// https://www.w3.org/TR/xml/#NT-EntityDecl
+
+// [70]     EntityDecl     ::=     GEDecl | PEDecl
+
+
+// TODO: WIP
+private let entityDeclaration = Parse {
+  "<!ENTITY".utf8
+  Skip { atLeastOneWhiteSpace }
+  OneOf {
+    generalEntityDeclaration.ignoreOutput().map { EntityDeclaration.general }
+    parameterEntityDeclaration.ignoreOutput().map { EntityDeclaration.parameter }
+  }
+  Skip { Whitespace() }
+  ">".utf8
+}
+
+private enum EntityDeclaration {
+  case general
+  case parameter
+}
+
+// [71]     GEDecl     ::=     '<!ENTITY' S Name S EntityDef S? '>'
+//                                  Parse { Name S EntityDef }
+
+private let generalEntityDeclaration = Parse {
+  name
+  Skip { atLeastOneWhiteSpace }
+  entityDefinition
+}
+
+// [72]     PEDecl     ::=     '<!ENTITY' S '%' S Name S PEDef S? '>'
+//                                  Parse { '%' S Name S PEDef }
+
+private let parameterEntityDeclaration = Parse {
+  "%".utf8
+  Skip { atLeastOneWhiteSpace }
+  name
+  Skip { atLeastOneWhiteSpace }
+  parameterEntityDefinition
+}
+
+// [73]     EntityDef     ::=     EntityValue | (ExternalID NDataDecl?)
+
+private enum EntityDefinition {
+  case `internal`(String)
+  case external(ExternalID, String?)
+}
+
+private let entityDefinition = OneOf {
+  entityValue.map(EntityDefinition.internal)
+  Parse {
+    externalId
+    Optionally { notationDeclaration }
+  }.map(EntityDefinition.external)
+}
+
+// [74]     PEDef     ::=     EntityValue | ExternalID
+
+private enum ParameterEntityDefinition {
+  case `internal`(String)
+  case external(ExternalID)
+}
+
+private let parameterEntityDefinition = OneOf {
+  entityValue.map(ParameterEntityDefinition.internal)
+  externalId.map(ParameterEntityDefinition.external)
+}
+
 // MARK: - External Entity Declaration
 
 // https://www.w3.org/TR/xml/#NT-ExternalID
 
 // [75]     ExternalID     ::=     'SYSTEM' S SystemLiteral | 'PUBLIC' S PubidLiteral S SystemLiteral
-// [76]     NDataDecl     ::=     S 'NDATA' S Name  [VC: Notation Declared]
 
 private enum ExternalID {
   case system(String)
@@ -656,6 +758,15 @@ private let externalId = OneOf {
     Skip { atLeastOneWhiteSpace }
     systemLiteral
   }.map(ExternalID.public)
+}
+
+// [76]     NDataDecl     ::=     S 'NDATA' S Name  [VC: Notation Declared]
+
+private let notationDeclaration = Parse {
+  Skip { atLeastOneWhiteSpace }
+  "NDATA".utf8
+  Skip { atLeastOneWhiteSpace }
+  name
 }
 
 // MARK: - Encoding Declaration
