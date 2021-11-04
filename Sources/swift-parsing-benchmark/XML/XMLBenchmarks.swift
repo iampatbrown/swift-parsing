@@ -495,6 +495,69 @@ private let mixed = OneOf {
   }.map { ContentSpecification.mixed(elementNames: []) }
 }
 
+// MARK: - Attribute-List Declarations
+
+// https://www.w3.org/TR/xml/#NT-AttlistDecl
+
+// [52]     AttlistDecl     ::=     '<!ATTLIST' S Name AttDef* S? '>'
+// [53]     AttDef     ::=     S Name S AttType S DefaultDecl
+
+private let attributeListDeclarations = Parse {
+  "<!ATTLIST".utf8
+  Skip { atLeastOneWhiteSpace }
+  name
+  Skip { Whitespace() }
+  ">".utf8
+}
+
+private let attributeDefinition = Parse {
+  Skip { atLeastOneWhiteSpace }
+  name
+  Skip { atLeastOneWhiteSpace }
+}
+
+// MARK: - Attribute Types
+
+// https://www.w3.org/TR/xml/#NT-AttType
+
+//  [54]     AttType     ::=     StringType | TokenizedType | EnumeratedType
+
+private let attributeType = OneOf {
+  "CDATA".utf8.map { AttributeType.string }
+}
+
+private enum AttributeType {
+  case string
+  case tokenized
+  case enumerated
+}
+
+//  [55]     StringType     ::=     'CDATA'
+//  [56]     TokenizedType     ::=     'ID'  [VC: ID]
+
+//  [VC: One ID per Element Type]
+//  [VC: ID Attribute Default]
+//  | 'IDREF'  [VC: IDREF]
+//  | 'IDREFS'  [VC: IDREF]
+//  | 'ENTITY'  [VC: Entity Name]
+//  | 'ENTITIES'  [VC: Entity Name]
+//  | 'NMTOKEN'  [VC: Name Token]
+//  | 'NMTOKENS'  [VC: Name Token]
+
+// private let tokenizedType = OneOf {
+//
+// }
+
+private enum TokenizedType: CaseIterable {
+  case id
+  case idRef
+  case idRefs
+  case entity
+  case entities
+  case nmToken
+  case nmTokens
+}
+
 // MARK: - External Entity Declaration
 
 // https://www.w3.org/TR/xml/#NT-ExternalID
