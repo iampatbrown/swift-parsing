@@ -524,6 +524,7 @@ private let attributeDefinition = Parse {
 
 private let attributeType = OneOf {
   "CDATA".utf8.map { AttributeType.string }
+  tokenizedType
 }
 
 private enum AttributeType {
@@ -533,10 +534,8 @@ private enum AttributeType {
 }
 
 //  [55]     StringType     ::=     'CDATA'
-//  [56]     TokenizedType     ::=     'ID'  [VC: ID]
-
-//  [VC: One ID per Element Type]
-//  [VC: ID Attribute Default]
+//  [56]     TokenizedType     ::=
+// 'ID'  [VC: ID] [VC: One ID per Element Type] [VC: ID Attribute Default]
 //  | 'IDREF'  [VC: IDREF]
 //  | 'IDREFS'  [VC: IDREF]
 //  | 'ENTITY'  [VC: Entity Name]
@@ -544,9 +543,15 @@ private enum AttributeType {
 //  | 'NMTOKEN'  [VC: Name Token]
 //  | 'NMTOKENS'  [VC: Name Token]
 
-// private let tokenizedType = OneOf {
-//
-// }
+private let tokenizedType = OneOf {
+  "ID".utf8.map { TokenizedType.id }
+  "IDREF".utf8.map { TokenizedType.idRef }
+  "IDREFS".utf8.map { TokenizedType.idRefs }
+  "ENTITY".utf8.map { TokenizedType.entity }
+  "ENTITIES".utf8.map { TokenizedType.entities }
+  "NMTOKEN".utf8.map { TokenizedType.nameToken }
+  "NMTOKENS".utf8.map { TokenizedType.nameTokens }
+}
 
 private enum TokenizedType: CaseIterable {
   case id
@@ -554,9 +559,34 @@ private enum TokenizedType: CaseIterable {
   case idRefs
   case entity
   case entities
-  case nmToken
-  case nmTokens
+  case nameToken
+  case nameTokens
 }
+
+// MARK: - Enumerated Attribute Types
+
+// https://www.w3.org/TR/xml/#NT-EnumeratedType
+
+// [57]     EnumeratedType     ::=     NotationType | Enumeration
+// [58]     NotationType     ::=     'NOTATION' S '(' S? Name (S? '|' S? Name)* S? ')'
+// [VC: Notation Attributes] [VC: One Notation Per Element Type] [VC: No Notation on Empty Element] [VC: No Duplicate Tokens]
+
+private let notationType = Parse {
+  "NOTATION".utf8
+  Skip { atLeastOneWhiteSpace }
+  "(".utf8
+  Many(atLeast: 1) {
+    Skip { Whitespace() }
+    name
+    Skip { Whitespace() }
+  } separatedBy: {
+    "|".utf8
+  }
+  ")".utf8
+}
+
+// [59]     Enumeration     ::=     '(' S? Nmtoken (S? '|' S? Nmtoken)* S? ')'
+// [VC: Enumeration] [VC: No Duplicate Tokens]
 
 // MARK: - External Entity Declaration
 
