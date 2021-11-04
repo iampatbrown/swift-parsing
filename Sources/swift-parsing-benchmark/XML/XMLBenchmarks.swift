@@ -69,10 +69,23 @@ private let name = Parse {
   UTF8.prefix(whileScalar: isNameCharacter)
 }.map(+)
 
-// TODO: Will do these when/if needed
 // [6]     Names     ::=     Name (#x20 Name)*
+
+private let names = Many(atLeast: 1) {
+  name
+} separatedBy: {
+  " ".utf8
+}
+
 // [7]     Nmtoken     ::=     (NameChar)+
+private let nameToken = UTF8.prefix(minLength: 1, whileScalar: isNameCharacter)
+
 // [8]     Nmtokens     ::=     Nmtoken (#x20 Nmtoken)*
+private let nameTokens = Many(atLeast: 1) {
+  nameToken
+} separatedBy: {
+  " ".utf8
+}
 
 // MARK: - Literals
 
@@ -514,6 +527,8 @@ private let attributeDefinition = Parse {
   Skip { atLeastOneWhiteSpace }
   name
   Skip { atLeastOneWhiteSpace }
+  attributeType
+  Skip { atLeastOneWhiteSpace }
 }
 
 // MARK: - Attribute Types
@@ -524,13 +539,14 @@ private let attributeDefinition = Parse {
 
 private let attributeType = OneOf {
   "CDATA".utf8.map { AttributeType.string }
-  tokenizedType
+  tokenizedType.map(AttributeType.tokenized)
+  enumeratedType.map(AttributeType.enumerated)
 }
 
 private enum AttributeType {
   case string
-  case tokenized
-  case enumerated
+  case tokenized(TokenizedType)
+  case enumerated(EnumeratedType)
 }
 
 //  [55]     StringType     ::=     'CDATA'
@@ -553,7 +569,7 @@ private let tokenizedType = OneOf {
   "NMTOKENS".utf8.map { TokenizedType.nameTokens }
 }
 
-private enum TokenizedType: CaseIterable {
+private enum TokenizedType {
   case id
   case idRef
   case idRefs
@@ -568,6 +584,17 @@ private enum TokenizedType: CaseIterable {
 // https://www.w3.org/TR/xml/#NT-EnumeratedType
 
 // [57]     EnumeratedType     ::=     NotationType | Enumeration
+
+private let enumeratedType = OneOf {
+  notationType
+  enumeration
+}
+
+private enum EnumeratedType {
+  case notation([String])
+  case enumeration([String])
+}
+
 // [58]     NotationType     ::=     'NOTATION' S '(' S? Name (S? '|' S? Name)* S? ')'
 // [VC: Notation Attributes] [VC: One Notation Per Element Type] [VC: No Notation on Empty Element] [VC: No Duplicate Tokens]
 
@@ -583,10 +610,26 @@ private let notationType = Parse {
     "|".utf8
   }
   ")".utf8
-}
+}.map(EnumeratedType.notation)
 
 // [59]     Enumeration     ::=     '(' S? Nmtoken (S? '|' S? Nmtoken)* S? ')'
 // [VC: Enumeration] [VC: No Duplicate Tokens]
+
+private let enumeration = Parse {
+  "(".utf8
+  Many(atLeast: 1) {
+    Skip { Whitespace() }
+    nameToken
+    Skip { Whitespace() }
+  } separatedBy: {
+    "|".utf8
+  }
+  ")".utf8
+}.map(EnumeratedType.enumeration)
+
+// MARK: - Attribute Defaults
+
+// https://www.w3.org/TR/xml/#NT-DefaultDecl
 
 // MARK: - External Entity Declaration
 
