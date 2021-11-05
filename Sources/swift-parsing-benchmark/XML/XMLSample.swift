@@ -3506,11 +3506,6 @@ let xmlInput = """
                 <Property Name="disabledPlans" Type="Collection(Edm.Guid)" Nullable="false"/>
                 <Property Name="skuId" Type="Edm.Guid"/>
             </ComplexType>
-        </Schema>
-    </edmx:DataServices>
-</edmx:Edmx>
-"""
-/*
             <ComplexType Name="assignedPlan">
                 <Property Name="assignedDateTime" Type="Edm.DateTimeOffset"/>
                 <Property Name="capabilityStatus" Type="Edm.String"/>
@@ -26952,4 +26947,3 @@ let xmlInput = """
     </edmx:DataServices>
 </edmx:Edmx>
 """
-*/

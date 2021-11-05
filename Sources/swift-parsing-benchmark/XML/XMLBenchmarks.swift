@@ -125,9 +125,32 @@ private func isEntityValueCharacter(_ s: UnicodeScalar) -> Bool {
 }
 
 // [10]     AttValue     ::=     '"' ([^<&"] | Reference)* '"' |  "'" ([^<&'] | Reference)* "'"
+// private let attributeValue = OneOf {
+//  doubleQuotedLiteral(scalar: isAttributeValueCharacter)
+//  singleQuotedLiteral(scalar: isAttributeValueCharacter)
+// }
+
 private let attributeValue = OneOf {
-  doubleQuotedLiteral(scalar: isAttributeValueCharacter)
-  singleQuotedLiteral(scalar: isAttributeValueCharacter)
+  doubleQuoted {
+    Many(into: "") {
+      OneOf {
+        UTF8.prefix(1...) { isAttributeValueCharacter($0) && $0 != "\"" }
+        reference
+      }
+    } do: { acc, part in
+      acc += part
+    }
+  }
+  singleQuoted {
+    Many(into: "") {
+      OneOf {
+        UTF8.prefix(1...) { isAttributeValueCharacter($0) && $0 != "'" }
+        reference
+      }
+    } do: { acc, part in
+      acc += part
+    }
+  }
 }
 
 private func isAttributeValueCharacter(_ s: UnicodeScalar) -> Bool {
@@ -1224,7 +1247,7 @@ extension Content: CustomDebugStringConvertible {
 extension Element: CustomDebugStringConvertible {
   var debugDescription: String {
     """
-    <\(self.name)\(self.attributes.isEmpty ? "" : "\(self.attributes.map(\.debugDescription).joined(separator: " "))")>
+    <\(self.name)\(self.attributes.isEmpty ? "" : " \(self.attributes.map(\.debugDescription).joined(separator: " "))")>
       \(self.content.map {
         "\($0.debugDescription.replacingOccurrences(of: "\n", with: "\n  "))"
       }.joined(separator: "\n  "))
@@ -1276,10 +1299,7 @@ extension Parser where Input == Substring.UTF8View {
 
 // MARK: - Benchmarks
 
-let xmlSuite = BenchmarkSuite(
-  name: "XML"
-//  settings: Iterations(1)
-) { suite in
+let xmlSuite = BenchmarkSuite(name: "XML") { suite in
   let input = """
   <note>
     <to>Tove</to>
@@ -1289,16 +1309,22 @@ let xmlSuite = BenchmarkSuite(
   </note>
   """
 
-//  print(input)
-//  print(document.parse(xmlInput).map { String(String(describing: $0).prefix(1000)) } ?? "nil")
 
   var xml: Document!
   suite.benchmark(
     name: "Parser",
-    run: { xml = document.parse(xmlInput) }
+    run: { xml = document.parse(input) }
+  )
+
+
+  let xmlData = input.data(using: .utf8)!
+
+  suite.benchmark(
+    name: "XMLParser",
+    run: {
+      let xmlParser = XMLParser(data: xmlData)
+      xmlParser.parse()
+    }
   )
 }
 
-func parseDocument() {
-  _ = document.parse(xmlInput)
-}

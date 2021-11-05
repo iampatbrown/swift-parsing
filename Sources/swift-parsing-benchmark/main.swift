@@ -24,8 +24,5 @@ Benchmark.main(
   ]
 )
 
-for _ in 0..<100 {
-  parseDocument()
-}
 
 
