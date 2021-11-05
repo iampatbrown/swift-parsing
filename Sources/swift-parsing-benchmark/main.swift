@@ -16,9 +16,10 @@ Benchmark.main(
 //    prefixUpToSuite,
 //    raceSuite,
 //    readmeExampleSuite,
-    routingSuite,
+//    routingSuite,
 //    stringAbstractionsSuite,
 //    uuidSuite,
 //    xcodeLogsSuite,
+    xmlSuite
   ]
 )

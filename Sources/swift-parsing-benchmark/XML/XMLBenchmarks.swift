@@ -1,4 +1,5 @@
-import CloudKit
+import Benchmark
+import Foundation
 import Parsing
 
 // MARK: - Parser
@@ -10,15 +11,17 @@ private typealias Input = Substring.UTF8View
 // https://www.w3.org/TR/xml/#NT-document
 // [1]     document     ::=     prolog element Misc*
 
-private struct Document: Equatable {
-  var header: String // Prolog
-  var root: String // Element
-  var misc: String // Misc
+private struct Document {
+  var prolog: Prolog
+  var root: Element
+  var misc: [Misc]
 }
 
-private let document = "document"
-
-private let element = "element"
+private let document = Parse {
+  prolog
+  element
+  Many { misc }
+}.map(Document.init)
 
 // MARK: - Character Range
 
@@ -37,6 +40,9 @@ private func isLegalCharacter(_ s: UnicodeScalar) -> Bool {
 // [3]     S     ::=     (#x20 | #x9 | #xD | #xA)+
 
 // S == WhiteSpace()
+
+// TODO: What's the preferred way to do this? maybe add atLeast: atMost: or I could do let whiteSpace =
+private let atLeastOneWhiteSpace = Whitespace().filter { !$0.isEmpty }
 
 // MARK: - Names and Tokens
 
@@ -78,7 +84,7 @@ private let names = Many(atLeast: 1) {
 }
 
 // [7]     Nmtoken     ::=     (NameChar)+
-private let nameToken = UTF8.prefix(minLength: 1, whileScalar: isNameCharacter)
+private let nameToken = UTF8.prefix(1..., whileScalar: isNameCharacter)
 
 // [8]     Nmtokens     ::=     Nmtoken (#x20 Nmtoken)*
 private let nameTokens = Many(atLeast: 1) {
@@ -93,11 +99,25 @@ private let nameTokens = Many(atLeast: 1) {
 
 // [9]     EntityValue     ::=     '"' ([^%&"] | PEReference | Reference)* '"' |  "'" ([^%&'] | PEReference | Reference)* "'"
 
-// TODO: References
-
 private let entityValue = OneOf {
-  doubleQuotedLiteral(scalar: isEntityValueCharacter)
-  singleQuotedLiteral(scalar: isEntityValueCharacter)
+  doubleQuoted {
+    Many {
+      OneOf {
+        UTF8.prefix { isEntityValueCharacter($0) && $0 != "\"" }
+        parameterEntityReference
+        reference
+      }
+    }
+  }
+  singleQuoted {
+    Many {
+      OneOf {
+        UTF8.prefix { isEntityValueCharacter($0) && $0 != "'" }
+        parameterEntityReference
+        reference
+      }
+    }
+  }
 }
 
 private func isEntityValueCharacter(_ s: UnicodeScalar) -> Bool {
@@ -122,12 +142,12 @@ private let systemLiteral = OneOf {
 
 // [12]     PubidLiteral     ::=     '"' PubidChar* '"' | "'" (PubidChar - "'")* "'"
 // [13]     PubidChar     ::=     #x20 | #xD | #xA | [a-zA-Z0-9] | [-'()+,./:=?;!*#@$_%]
-private let pubidLiteral = OneOf {
-  doubleQuotedLiteral(scalar: isPubidCharacter)
-  singleQuotedLiteral(scalar: isPubidCharacter)
+private let publicIdLiteral = OneOf {
+  doubleQuotedLiteral(scalar: isPublicIdCharacter)
+  singleQuotedLiteral(scalar: isPublicIdCharacter)
 }
 
-private func isPubidCharacter(_ s: UnicodeScalar) -> Bool {
+private func isPublicIdCharacter(_ s: UnicodeScalar) -> Bool {
   switch s {
   case "_", "-", ",", ";", ":", "!", "?", ".", "'", "(", ")", "@", "*", "/", "\u{20}", "\u{a}", "\u{d}", "#", "%", "+",
        "=", "$", "0"..."9", "a"..."z", "A"..."Z": return true
@@ -180,6 +200,7 @@ private func singleQuotedLiteral(
 // [14]     CharData     ::=     [^<&]* - ([^<&]* ']]>' [^<&]*)
 
 private let characterData = UTF8.prefix(whileScalar: isCharacterDataCharacter, orUpTo: "]]>".utf8)
+  .filter { !$0.isEmpty }
 
 private func isCharacterDataCharacter(_ s: UnicodeScalar) -> Bool {
   s != "<" && s != "&"
@@ -220,9 +241,6 @@ private let processingInstructions = Parse {
 
 private let piTarget = name.filter { $0.lowercased() != "xml" }
 
-// TODO: What's the preferred way to do this? maybe add atLeast: atMost: or I could do let whiteSpace =
-private let atLeastOneWhiteSpace = Whitespace().filter { !$0.isEmpty }
-
 // MARK: - CDATA Sections
 
 // https://www.w3.org/TR/xml/#dt-cdsection
@@ -243,12 +261,29 @@ private let cDataSection = Parse {
 // https://www.w3.org/TR/xml/#sec-prolog-dtd
 
 //  [22]     prolog     ::=     XMLDecl? Misc* (doctypedecl Misc*)?
+
+private struct Prolog {
+  var xmlDeclaration: XMLDeclaration?
+  var documentTypeDeclaration: DocumentTypeDeclaration?
+  var misc: [Misc] = []
+}
+
 private let prolog = Parse {
   Optionally { xmlDeclaration }
-  Many { misc } separatedBy: { "utf8".utf8 }
+  Many { misc }
+  Optionally { documentTypeDeclaration }
+  Many { misc } // should be [] if there's no documentTypeDeclaration
+}.map {
+  Prolog(xmlDeclaration: $0, documentTypeDeclaration: $2, misc: $1 + $3)
 }
 
 //  [23]     XMLDecl     ::=     '<?xml' VersionInfo EncodingDecl? SDDecl? S? '?>'
+
+private struct XMLDeclaration {
+  var version: String
+  var encodingType: String?
+  var isStandalone: Bool?
+}
 
 private let xmlDeclaration = Parse {
   "<?xml".utf8
@@ -257,7 +292,7 @@ private let xmlDeclaration = Parse {
   Optionally { standaloneDocumentDeclaration }
   Skip { Whitespace() }
   "?>".utf8
-}
+}.map(XMLDeclaration.init)
 
 //  [24]     VersionInfo     ::=     S 'version' Eq ("'" VersionNum "'" | '"' VersionNum '"')
 
@@ -283,8 +318,12 @@ private let equalSign = Parse {
 
 private let versionNumber = Parse {
   "1.".utf8.map { "1." }
-  UTF8.prefix { "0"..."9" ~= $0 }
+  UTF8.prefix(1..., whileScalar: isDigit)
 }.map(+) // just keeping as string for now
+
+private func isDigit(_ s: UnicodeScalar) -> Bool {
+  "0"..."9" ~= s // ("0"..."9").contains(s) TODO: Is there a preference here?
+}
 
 //  [27]     Misc     ::=     Comment | PI | S
 private enum Misc {
@@ -305,6 +344,12 @@ private let misc = OneOf {
 
 // [28]     doctypedecl     ::=     '<!DOCTYPE' S Name (S ExternalID)? S? ('[' intSubset ']' S?)? '>' [VC: Root Element Type], [WFC: External Subset]
 
+private struct DocumentTypeDeclaration {
+  var name: String
+  var externalId: ExternalID?
+  var internalSubsets: [InternalSubset]?
+}
+
 private let documentTypeDeclaration = Parse {
   "<!DOCTYPE".utf8
   Parse { // TODO: Extra Variadic or just extract it?
@@ -317,31 +362,76 @@ private let documentTypeDeclaration = Parse {
     Skip { Whitespace() }
     Optionally {
       "[".utf8
-      // TODO: intSubset
+      internalSubset
       "]".utf8
       Skip { Whitespace() }
     }
   }
   ">".utf8
-}
+}.map(DocumentTypeDeclaration.init)
 
 // [28a]     DeclSep     ::=     PEReference | S  [WFC: PE Between Declarations]
+private let declarationSeparator = OneOf {
+  parameterEntityReference.map(DeclarationSeparator.parameterEntityReference)
+  atLeastOneWhiteSpace.map { _ in DeclarationSeparator.whiteSpace }
+}
+
+private enum DeclarationSeparator {
+  case parameterEntityReference(String)
+  case whiteSpace
+}
 
 // [28b]     intSubset     ::=     (markupdecl | DeclSep)*
+
+private let internalSubset = Many(into: [InternalSubset]()) {
+  OneOf {
+    markupDeclaration.map(InternalSubset.markup)
+    declarationSeparator.map(InternalSubset.from(separator:))
+  }
+} do: { subset, item in
+  if case .whiteSpace = item { return }
+  subset.append(item)
+}
+
+private enum InternalSubset {
+  case markup(MarkupDeclaration)
+  case parameterEntityReference(String)
+  case whiteSpace
+
+  static func from(separator: DeclarationSeparator) -> Self {
+    switch separator {
+    case let .parameterEntityReference(ref): return .parameterEntityReference(ref)
+    case .whiteSpace: return .whiteSpace
+    }
+  }
+}
 
 // [29]     markupdecl     ::=     elementdecl | AttlistDecl | EntityDecl | NotationDecl | PI | Comment
 // [VC: Proper Declaration/PE Nesting] [WFC: PEs in Internal Subset]
 
-// TODO: WIP
 private let markupDeclaration = OneOf {
-  elementDeclaration
-  // attributeListDeclaration
+  elementDeclaration.map(MarkupDeclaration.element)
+  attributeListDeclaration.map(MarkupDeclaration.attributeList)
+  entityDeclaration.map(MarkupDeclaration.entity)
+  notationDeclaration.map(MarkupDeclaration.notation)
+  processingInstructions.map(MarkupDeclaration.processingInstructions)
+  comment.map(MarkupDeclaration.comment)
 }
 
 private enum MarkupDeclaration {
-  case element
-  case attributeList
+  case element(ElementDeclaration)
+  case attributeList(AttributeListDeclaration)
+  case entity(EntityDeclaration)
+  case notation(NotationDeclaration)
+  case processingInstructions(ProcessingInstructions)
+  case comment(String)
 }
+
+// MARK: - External Subset
+
+// TODO: Implement when neeeded
+// [30]     extSubset     ::=     TextDecl? extSubsetDecl
+// [31]     extSubsetDecl     ::=     ( markupdecl | conditionalSect | DeclSep)*
 
 // MARK: - Standalone Document Declaration
 
@@ -365,12 +455,148 @@ private let isStandalone = OneOf {
   "no".utf8.map { false }
 }
 
+// (Productions 33 through 38 have been removed.)
+
+// MARK: - Logical Structures
+
+// [39]     element     ::=     EmptyElemTag | STag content ETag  [WFC: Element Type Match] [VC: Element Valid]
+
+private var element: AnyParser<Input, Element> {
+  Parse {
+    OneOf {
+      emptyElement // also includes STag ETag
+      nonEmptyElement
+    }
+  }.eraseToAnyParser()
+}
+
+private let emptyElement = OneOf {
+  emptyElementTag
+    .map { Element(name: $0.name, attributes: $0.attributes) }
+  Parse {
+    startTag
+    endTag
+  }
+  .compactMap { $0.name == $1.name ? Element(name: $0.name, attributes: $0.attributes) : nil }
+}
+
+private var nonEmptyElement: AnyParser<Input, Element> {
+  Parse {
+    startTag
+    Lazy { content }
+    endTag
+  }
+  .compactMap { $0.name == $2.name ? Element(name: $0.name, attributes: $0.attributes, content: $1) : nil }
+  .eraseToAnyParser()
+}
+
+private struct Element {
+  var name: String
+  var attributes: [Attribute] = []
+  var content: [Content] = []
+}
+
+private enum ElementTag {
+  case empty(name: String, attributes: [Attribute])
+  case start(name: String, attributes: [Attribute])
+  case end(name: String)
+
+  var name: String {
+    switch self {
+    case let .empty(name, _), let .end(name), let .start(name, _): return name
+    }
+  }
+
+  var attributes: [Attribute] {
+    switch self {
+    case let .empty(_, attributes), let .start(_, attributes): return attributes
+    case .end: return []
+    }
+  }
+}
+
+// [40]     STag     ::=     '<' Name (S Attribute)* S? '>'  [WFC: Unique Att Spec]
+
+private let startTag = Parse {
+  "<".utf8
+  name
+  Many {
+    Skip { atLeastOneWhiteSpace }
+    attribute
+  }
+  Skip { Whitespace() }
+  ">".utf8
+}.map(ElementTag.start)
+
+// [41]     Attribute     ::=     Name Eq AttValue  [VC: Attribute Value Type] [WFC: No External Entity References] [WFC: No < in Attribute Values]
+private let attribute = Parse {
+  name
+  equalSign
+  attributeValue
+}.map(Attribute.init)
+
+private struct Attribute {
+  var name: String
+  var value: String
+}
+
+// [42]     ETag     ::=     '</' Name S? '>'
+
+private let endTag = Parse {
+  "</".utf8
+  name
+  Skip { Whitespace() }
+  ">".utf8
+}.map(ElementTag.end)
+
+// [43]     content     ::=     CharData? ((element | Reference | CDSect | PI | Comment) CharData?)*
+
+private enum Content {
+  case text(String)
+  case element(Element)
+  case reference(String)
+  case cDataSection(String)
+  case processingInstructions(ProcessingInstructions)
+  case comment(String)
+}
+
+private let content = Many {
+  Skip { Whitespace() }
+  OneOf {
+    characterData.map(Content.text)
+    Lazy { element }.map(Content.element)
+    reference.map(Content.reference)
+    cDataSection.map(Content.cDataSection)
+    processingInstructions.map(Content.processingInstructions)
+    comment.map(Content.comment)
+  }
+  Skip { Whitespace() }
+}
+
+// [44]     EmptyElemTag     ::=     '<' Name (S Attribute)* S? '/>'  [WFC: Unique Att Spec]
+
+private let emptyElementTag = Parse {
+  "<".utf8
+  name
+  Many {
+    Skip { atLeastOneWhiteSpace }
+    attribute
+  }
+  Skip { Whitespace() }
+  "/>".utf8
+}.map(ElementTag.empty)
+
 // MARK: - Element Type Declarations
 
 // https://www.w3.org/TR/xml/#NT-elementdecl
 
 // [45]     elementdecl     ::=     '<!ELEMENT' S Name S contentspec S? '>'  [VC: Unique Element Type Declaration]
 // [46]     contentspec     ::=     'EMPTY' | 'ANY' | Mixed | children
+
+private struct ElementDeclaration {
+  var name: String
+  var contentSpecification: ContentSpecification
+}
 
 private let elementDeclaration = Parse {
   "<!ELEMENT".utf8
@@ -382,7 +608,7 @@ private let elementDeclaration = Parse {
     Skip { Whitespace() }
   }
   ">".utf8
-}
+}.map(ElementDeclaration.init)
 
 private let contentSpecification = OneOf {
   "EMPTY".utf8.map { ContentSpecification.empty }
@@ -410,8 +636,9 @@ private let children = Parse {
     orderedElements.map(ContentParticle.Element.ordered)
   }
   particleCount
-}.map(ContentParticle.init)
-  .map(ContentSpecification.children)
+}
+.map(ContentParticle.init)
+.map(ContentSpecification.children)
 
 // [48]     cp     ::=     (Name | choice | seq) ('?' | '*' | '+')?
 
@@ -444,10 +671,10 @@ private struct ContentParticle {
   var element: Element
   var count: Count
 
-  indirect enum Element {
+  enum Element {
     case named(String)
-    case oneOf([ContentParticle]) // should be at least 2
-    case ordered([ContentParticle]) // at least one
+    indirect case oneOf([ContentParticle]) // should be at least 2
+    indirect case ordered([ContentParticle]) // at least one
   }
 
   enum Count {
@@ -463,7 +690,7 @@ private let oneOfElements = Parse {
   "(".utf8
   Many(atLeast: 2) {
     Skip { Whitespace() }
-    contentParticle
+    Lazy { contentParticle }
     Skip { Whitespace() }
   } separatedBy: {
     "|".utf8
@@ -476,7 +703,7 @@ private let orderedElements = Parse {
   "(".utf8
   Many(atLeast: 1) {
     Skip { Whitespace() }
-    contentParticle
+    Lazy { contentParticle }
     Skip { Whitespace() }
   } separatedBy: {
     ",".utf8
@@ -520,6 +747,11 @@ private let mixed = OneOf {
 
 // [52]     AttlistDecl     ::=     '<!ATTLIST' S Name AttDef* S? '>'
 
+private struct AttributeListDeclaration {
+  var elementName: String
+  var attributeDefinitions: [AttributeDefinition]
+}
+
 private let attributeListDeclaration = Parse {
   "<!ATTLIST".utf8
   Skip { atLeastOneWhiteSpace }
@@ -527,9 +759,15 @@ private let attributeListDeclaration = Parse {
   Many { attributeDefinition }
   Skip { Whitespace() }
   ">".utf8
-}
+}.map(AttributeListDeclaration.init)
 
 // [53]     AttDef     ::=     S Name S AttType S DefaultDecl
+
+private struct AttributeDefinition {
+  var name: String
+  var type: AttributeType
+  var defaults: AttributeDefaults
+}
 
 private let attributeDefinition = Parse {
   Skip { atLeastOneWhiteSpace }
@@ -538,7 +776,7 @@ private let attributeDefinition = Parse {
   attributeType
   Skip { atLeastOneWhiteSpace }
   attributeDefaults
-}
+}.map(AttributeDefinition.init)
 
 // MARK: - Attribute Types
 
@@ -663,41 +901,89 @@ private enum AttributeDefaults {
   case `default`(String)
 }
 
+// TODO: Condition Sections
+
+// [61]     conditionalSect     ::=     includeSect | ignoreSect
+// [62]     includeSect     ::=     '<![' S? 'INCLUDE' S? '[' extSubsetDecl ']]>'  [VC: Proper Conditional Section/PE Nesting]
+// [63]     ignoreSect     ::=     '<![' S? 'IGNORE' S? '[' ignoreSectContents* ']]>'  [VC: Proper Conditional Section/PE Nesting]
+// [64]     ignoreSectContents     ::=     Ignore ('<![' ignoreSectContents ']]>' Ignore)*
+// [65]     Ignore     ::=     Char* - (Char* ('<![' | ']]>') Char*)
+
+// MARK: - Entity Reference
+
+// https://www.w3.org/TR/xml/#NT-CharRef
+
+// [66]     CharRef     ::=     '&#' [0-9]+ ';' | '&#x' [0-9a-fA-F]+ ';'  [WFC: Legal Character]
+
+private let characterReference = OneOf {
+  Parse {
+    "&#".utf8
+    UTF8.prefix(1..., whileScalar: isDigit)
+    ";".utf8
+  }
+  Parse {
+    "&#x".utf8
+    UTF8.prefix(1..., whileScalar: isHexDigit)
+    ";".utf8
+  }
+}
+
+private func isHexDigit(_ s: UnicodeScalar) -> Bool {
+  isDigit(s) || "A"..."F" ~= s || "a"..."f" ~= s
+}
+
+// [67]    Reference    ::=     EntityRef | CharRef
+
+private let reference = OneOf {
+  entityReference
+  characterReference
+}
+
+// [68]     EntityRef     ::=     '&' Name ';'  [WFC: Entity Declared] [VC: Entity Declared] [WFC: Parsed Entity] [WFC: No Recursion]
+
+private let entityReference = Parse {
+  "&".utf8
+  name
+  ";".utf8
+}
+
+// [69]     PEReference     ::=     '%' Name ';'  [VC: Entity Declared] [WFC: No Recursion] [WFC: In DTD]
+
+private let parameterEntityReference = Parse {
+  "%".utf8
+  name
+  ";".utf8
+}
+
 // MARK: - Entity Declarations
 
 // https://www.w3.org/TR/xml/#NT-EntityDecl
 
 // [70]     EntityDecl     ::=     GEDecl | PEDecl
+// [71]     GEDecl     ::=     '<!ENTITY' S Name S EntityDef S? '>'
+// [72]     PEDecl     ::=     '<!ENTITY' S '%' S Name S PEDef S? '>'
 
+private enum EntityDeclaration {
+  case general(String, EntityDefinition)
+  case parameter(String, ParameterEntityDefinition)
+}
 
-// TODO: WIP
 private let entityDeclaration = Parse {
   "<!ENTITY".utf8
   Skip { atLeastOneWhiteSpace }
   OneOf {
-    generalEntityDeclaration.ignoreOutput().map { EntityDeclaration.general }
-    parameterEntityDeclaration.ignoreOutput().map { EntityDeclaration.parameter }
+    generalEntityDeclaration.map(EntityDeclaration.general)
+    parameterEntityDeclaration.map(EntityDeclaration.parameter)
   }
   Skip { Whitespace() }
   ">".utf8
 }
-
-private enum EntityDeclaration {
-  case general
-  case parameter
-}
-
-// [71]     GEDecl     ::=     '<!ENTITY' S Name S EntityDef S? '>'
-//                                  Parse { Name S EntityDef }
 
 private let generalEntityDeclaration = Parse {
   name
   Skip { atLeastOneWhiteSpace }
   entityDefinition
 }
-
-// [72]     PEDecl     ::=     '<!ENTITY' S '%' S Name S PEDef S? '>'
-//                                  Parse { '%' S Name S PEDef }
 
 private let parameterEntityDeclaration = Parse {
   "%".utf8
@@ -710,7 +996,7 @@ private let parameterEntityDeclaration = Parse {
 // [73]     EntityDef     ::=     EntityValue | (ExternalID NDataDecl?)
 
 private enum EntityDefinition {
-  case `internal`(String)
+  case `internal`([String])
   case external(ExternalID, String?)
 }
 
@@ -718,14 +1004,14 @@ private let entityDefinition = OneOf {
   entityValue.map(EntityDefinition.internal)
   Parse {
     externalId
-    Optionally { notationDeclaration }
+    Optionally { notationDataDeclaration }
   }.map(EntityDefinition.external)
 }
 
 // [74]     PEDef     ::=     EntityValue | ExternalID
 
 private enum ParameterEntityDefinition {
-  case `internal`(String)
+  case `internal`([String])
   case external(ExternalID)
 }
 
@@ -754,7 +1040,7 @@ private let externalId = OneOf {
   Parse {
     "PUBLIC".utf8
     Skip { atLeastOneWhiteSpace }
-    pubidLiteral
+    publicIdLiteral
     Skip { atLeastOneWhiteSpace }
     systemLiteral
   }.map(ExternalID.public)
@@ -762,12 +1048,16 @@ private let externalId = OneOf {
 
 // [76]     NDataDecl     ::=     S 'NDATA' S Name  [VC: Notation Declared]
 
-private let notationDeclaration = Parse {
+private let notationDataDeclaration = Parse {
   Skip { atLeastOneWhiteSpace }
   "NDATA".utf8
   Skip { atLeastOneWhiteSpace }
   name
 }
+
+// TODO: Parsed Entities
+// [77]     TextDecl     ::=     '<?xml' VersionInfo? EncodingDecl S? '?>'
+// [78]     extParsedEnt     ::=     TextDecl? content
 
 // MARK: - Encoding Declaration
 
@@ -801,6 +1091,41 @@ private func isEncodingNameCharacter(_ s: UnicodeScalar) -> Bool {
   case "_", "-", ".", "0"..."9": return true
   default: return false
   }
+}
+
+// MARK: - Notation Declarations
+
+// https://www.w3.org/TR/xml/#NT-NotationDecl
+
+// [82]     NotationDecl     ::=     '<!NOTATION' S Name S (ExternalID | PublicID) S? '>'  [VC: Unique Notation Name]
+
+private struct NotationDeclaration {
+  var name: String
+  var id: ID
+
+  enum ID {
+    case external(ExternalID)
+    case `public`(String)
+  }
+}
+
+private let notationDeclaration = Parse {
+  "<!NOTATION".utf8
+  Skip { atLeastOneWhiteSpace }
+  name
+  Skip { atLeastOneWhiteSpace }
+  OneOf {
+    externalId.map(NotationDeclaration.ID.external)
+    publicId.map(NotationDeclaration.ID.public)
+  }
+  ">".utf8
+}.map(NotationDeclaration.init)
+
+// [83]     PublicID     ::=     'PUBLIC' S PubidLiteral
+private let publicId = Parse {
+  "PUBLIC".utf8
+  Skip { atLeastOneWhiteSpace }
+  publicIdLiteral
 }
 
 // MARK: - Helpers
@@ -841,6 +1166,13 @@ extension UTF8 {
   }
 
   fileprivate static func prefix(
+    _ length: PartialRangeFrom<Int>,
+    whileScalar predicate: @escaping (UnicodeScalar) -> Bool
+  ) -> AnyParser<Substring.UTF8View, String> {
+    prefix(minLength: length.lowerBound, whileScalar: predicate)
+  }
+
+  fileprivate static func prefix(
     whileScalar predicate: @escaping (UnicodeScalar) -> Bool,
     orUpTo possibleMatch: String.UTF8View
   ) -> AnyParser<Substring.UTF8View, String> {
@@ -863,3 +1195,110 @@ extension UTF8 {
     }
   }
 }
+
+// MARK: - Debugging
+
+extension String {
+  private func indent(by indent: Int) -> String {
+    let indentation = String(repeating: " ", count: indent)
+    return indentation + self.replacingOccurrences(of: "\n", with: "\n\(indentation)")
+  }
+}
+
+extension Attribute: CustomDebugStringConvertible {
+  var debugDescription: String {
+    "\(self.name)=\"\(self.value)\""
+  }
+}
+
+extension Content: CustomDebugStringConvertible {
+  var debugDescription: String {
+    switch self {
+    case let .cDataSection(text), let .reference(text), let .text(text): return text
+    case let .element(element): return element.debugDescription
+    case let .comment(comment): return "<!-- \(comment) -->"
+    case .processingInstructions: return "ProcessingInstructions"
+    }
+  }
+}
+
+extension Element: CustomDebugStringConvertible {
+  var debugDescription: String {
+    """
+    <\(self.name)\(self.attributes.isEmpty ? "" : "\(self.attributes.map(\.debugDescription).joined(separator: " "))")>
+      \(self.content.map {
+        "\($0.debugDescription.replacingOccurrences(of: "\n", with: "\n  "))"
+      }.joined(separator: "\n  "))
+    </\(self.name)>
+    """
+  }
+}
+
+extension Parser where Input == Substring.UTF8View {
+  fileprivate func debug(
+    _ prefix: String = "",
+    line: UInt = #line,
+    describeOutput: @escaping (Output) -> String = { String(describing: $0) }
+  ) -> AnyParser<Input, Output> {
+    AnyParser { input in
+      let originalInput = String(decoding: input, as: UTF8.self)
+      if let output = self.parse(&input) {
+        print(
+          """
+          Parsed\(prefix.isEmpty ? "" : " \(prefix)"):
+          ---
+          \(describeOutput(output))
+          ---
+          """
+        )
+        return output
+      } else {
+        print(
+          """
+          Parsing \(prefix.isEmpty ? "" : "\(prefix) ")failure@\(line)
+          ---
+          \(originalInput)
+          ---
+
+          """
+        )
+        return nil
+      }
+    }
+  }
+
+  fileprivate func debug(
+    _ prefix: String = "",
+    line: UInt = #line
+  ) -> AnyParser<Input, Output> where Output == Input {
+    self.debug(prefix, line: line, describeOutput: { String(decoding: $0, as: UTF8.self) })
+  }
+}
+
+// MARK: - Benchmarks
+
+let xmlSuite = BenchmarkSuite(
+  name: "XML"
+//  settings: Iterations(1)
+) { suite in
+  let input = """
+  <note>
+    <to>Tove</to>
+    <from>Jani</from>
+    <heading>Reminder</heading>
+    <body>Don't forget me this weekend!</body>
+  </note>
+  """
+
+  print(input)
+  print(document.parse(input) ?? "nil")
+
+
+  var xml: Document!
+  suite.benchmark(
+    name: "Parser",
+    run: { xml = document.parse(input) }
+  )
+}
+
+
