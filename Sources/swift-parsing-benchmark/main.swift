@@ -23,3 +23,9 @@ Benchmark.main(
     xmlSuite
   ]
 )
+
+for _ in 0..<100 {
+  parseDocument()
+}
+
+

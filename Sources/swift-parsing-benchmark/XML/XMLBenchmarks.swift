@@ -1177,12 +1177,11 @@ extension UTF8 {
     orUpTo possibleMatch: String.UTF8View
   ) -> AnyParser<Substring.UTF8View, String> {
     AnyParser { input in
-      let maxCount = PrefixUpTo(possibleMatch).parse(input).output?.count ?? .max
       var utf8Decoder = Unicode.UTF8()
       var bytesIterator = input.makeIterator()
       var count = 0
 
-      Decode: while count < maxCount {
+      Decode: while !bytesIterator.starts(with: possibleMatch) {
         switch utf8Decoder.decode(&bytesIterator) {
         case let .scalarValue(scalar) where predicate(scalar):
           count += UTF8.width(scalar)
@@ -1290,15 +1289,16 @@ let xmlSuite = BenchmarkSuite(
   </note>
   """
 
-  print(input)
-  print(document.parse(input) ?? "nil")
-
+//  print(input)
+//  print(document.parse(xmlInput).map { String(String(describing: $0).prefix(1000)) } ?? "nil")
 
   var xml: Document!
   suite.benchmark(
     name: "Parser",
-    run: { xml = document.parse(input) }
+    run: { xml = document.parse(xmlInput) }
   )
 }
 
-
+func parseDocument() {
+  _ = document.parse(xmlInput)
+}
