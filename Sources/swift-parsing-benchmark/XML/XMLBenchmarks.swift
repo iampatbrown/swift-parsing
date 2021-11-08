@@ -132,24 +132,20 @@ private func isEntityValueCharacter(_ s: UnicodeScalar) -> Bool {
 
 private let attributeValue = OneOf {
   doubleQuoted {
-    Many(into: "") {
+    Many {
       OneOf {
         UTF8.prefix(1...) { isAttributeValueCharacter($0) && $0 != "\"" }
         reference
       }
-    } do: { acc, part in
-      acc += part
-    }
+    }.map { $0.joined() }
   }
   singleQuoted {
-    Many(into: "") {
+    Many {
       OneOf {
         UTF8.prefix(1...) { isAttributeValueCharacter($0) && $0 != "'" }
         reference
       }
-    } do: { acc, part in
-      acc += part
-    }
+    }.map { $0.joined() }
   }
 }
 
@@ -406,14 +402,18 @@ private enum DeclarationSeparator {
 
 // [28b]     intSubset     ::=     (markupdecl | DeclSep)*
 
-private let internalSubset = Many(into: [InternalSubset]()) {
+private let internalSubset = Many(into: [InternalSubset]()) { intSubset, content in
+  switch content {
+  case .whiteSpace:
+    return
+  case .markup, .parameterEntityReference:
+    intSubset.append(content)
+  }
+} forEach: {
   OneOf {
     markupDeclaration.map(InternalSubset.markup)
     declarationSeparator.map(InternalSubset.from(separator:))
   }
-} do: { subset, item in
-  if case .whiteSpace = item { return }
-  subset.append(item)
 }
 
 private enum InternalSubset {
