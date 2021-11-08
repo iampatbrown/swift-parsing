@@ -1218,85 +1218,6 @@ extension UTF8 {
   }
 }
 
-// MARK: - Debugging
-
-extension String {
-  private func indent(by indent: Int) -> String {
-    let indentation = String(repeating: " ", count: indent)
-    return indentation + self.replacingOccurrences(of: "\n", with: "\n\(indentation)")
-  }
-}
-
-extension Attribute: CustomDebugStringConvertible {
-  var debugDescription: String {
-    "\(self.name)=\"\(self.value)\""
-  }
-}
-
-extension Content: CustomDebugStringConvertible {
-  var debugDescription: String {
-    switch self {
-    case let .cDataSection(text), let .reference(text), let .text(text): return text
-    case let .element(element): return element.debugDescription
-    case let .comment(comment): return "<!-- \(comment) -->"
-    case .processingInstructions: return "ProcessingInstructions"
-    }
-  }
-}
-
-extension Element: CustomDebugStringConvertible {
-  var debugDescription: String {
-    """
-    <\(self.name)\(self.attributes.isEmpty ? "" : " \(self.attributes.map(\.debugDescription).joined(separator: " "))")>
-      \(self.content.map {
-        "\($0.debugDescription.replacingOccurrences(of: "\n", with: "\n  "))"
-      }.joined(separator: "\n  "))
-    </\(self.name)>
-    """
-  }
-}
-
-extension Parser where Input == Substring.UTF8View {
-  fileprivate func debug(
-    _ prefix: String = "",
-    line: UInt = #line,
-    describeOutput: @escaping (Output) -> String = { String(describing: $0) }
-  ) -> AnyParser<Input, Output> {
-    AnyParser { input in
-      let originalInput = String(decoding: input, as: UTF8.self)
-      if let output = self.parse(&input) {
-        print(
-          """
-          Parsed\(prefix.isEmpty ? "" : " \(prefix)"):
-          ---
-          \(describeOutput(output))
-          ---
-          """
-        )
-        return output
-      } else {
-        print(
-          """
-          Parsing \(prefix.isEmpty ? "" : "\(prefix) ")failure@\(line)
-          ---
-          \(originalInput)
-          ---
-
-          """
-        )
-        return nil
-      }
-    }
-  }
-
-  fileprivate func debug(
-    _ prefix: String = "",
-    line: UInt = #line
-  ) -> AnyParser<Input, Output> where Output == Input {
-    self.debug(prefix, line: line, describeOutput: { String(decoding: $0, as: UTF8.self) })
-  }
-}
-
 // MARK: - Benchmarks
 
 let xmlSuite = BenchmarkSuite(name: "XML") { suite in
@@ -1304,27 +1225,16 @@ let xmlSuite = BenchmarkSuite(name: "XML") { suite in
   <note>
     <to>Tove</to>
     <from>Jani</from>
-    <heading>Reminder</heading>
+    <heading>Reminder</heading>x
     <body>Don't forget me this weekend!</body>
   </note>
   """
 
+  suite.benchmark("Parser") {
+    let xml = document.parse(input)
+  }
 
-  var xml: Document!
-  suite.benchmark(
-    name: "Parser",
-    run: { xml = document.parse(input) }
-  )
-
-
-  let xmlData = input.data(using: .utf8)!
-
-  suite.benchmark(
-    name: "XMLParser",
-    run: {
-      let xmlParser = XMLParser(data: xmlData)
-      xmlParser.parse()
-    }
-  )
+  suite.benchmark("XMLParser") {
+    let xml = try! XMLDocument(xmlString: input)
+  }
 }
-
