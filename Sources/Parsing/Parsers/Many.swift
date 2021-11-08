@@ -6,7 +6,11 @@
 ///
 /// ```swift
 /// var input = "1,2,3"[...]
-/// let output = Many(Int.parser(), separator: ",").parse(&input)
+/// let output = Many {
+///   Int.parser()
+/// } separatedBy: {
+///   ","
+/// }.parse(&input)
 /// precondition(input == "")
 /// precondition(output == [1, 2, 3])
 /// ```
@@ -16,12 +20,11 @@
 /// instead of accumulating each value in an array:
 ///
 /// ```
-/// let sumParser = Many(
-///   Int.parser(of: Substring.self),
-///   into: 0,
-///   separator: StartsWith(","),
-///   +=
-/// )
+/// let sumParser = Many(into: 0, +=) {
+///   Int.parser()
+/// } separatedBy: {
+///   ","
+/// }
 /// var input = "1,2,3"[...]
 /// let output = Many(Int.parser(), into: 0, separator: ",").parse(&input)
 /// precondition(input == "")
@@ -71,11 +74,11 @@ where
   @inlinable
   public init(
     into initialResult: Result,
+    _ updateAccumulatingResult: @escaping (inout Result, Upstream.Output) -> Void,
     atLeast minimum: Int = 0,
     atMost maximum: Int = .max,
     @ParserBuilder forEach: () -> Upstream,
-    @ParserBuilder separatedBy separator: () -> Separator,
-    do updateAccumulatingResult: @escaping (inout Result, Upstream.Output) -> Void
+    @ParserBuilder separatedBy separator: () -> Separator
   ) {
     self.initialResult = initialResult
     self.maximum = maximum
@@ -208,11 +211,11 @@ extension Many where Separator == Always<Input, Void> {
 
   @inlinable
   public init(
-    into initialResult: Result,
     atLeast minimum: Int = 0,
     atMost maximum: Int = .max,
-    @ParserBuilder forEach: () -> Upstream,
-    do updateAccumulatingResult: @escaping (inout Result, Upstream.Output) -> Void
+    into initialResult: Result,
+    _ updateAccumulatingResult: @escaping (inout Result, Upstream.Output) -> Void,
+    @ParserBuilder forEach: () -> Upstream
   ) {
     self.initialResult = initialResult
     self.maximum = maximum

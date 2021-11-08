@@ -51,7 +51,10 @@ private var json: AnyParser<Input, JSON> {
 
 private let object = Parse {
   "{".utf8
-  Many(into: [String: JSON]()) {
+  Many(into: [String: JSON]()) { object, pair in
+    let (name, value) = pair
+    object[name] = value
+  } forEach: {
     Skip {
       Whitespace()
     }
@@ -68,9 +71,6 @@ private let object = Parse {
     Skip {
       Whitespace()
     }
-  } do: { object, pair in
-    let (name, value) = pair
-    object[name] = value
   }
   "}".utf8
 }
@@ -137,15 +137,15 @@ private let fragment = OneOf {
 
 private let stringLiteral = Parse {
   "\"".utf8
-  Many(into: "") {
-    fragment
-  } do: { string, fragment in
+  Many(into: "") { string, fragment in
     switch fragment {
     case let .escape(character):
       string.append(character)
     case let .literal(other):
       string.append(contentsOf: other)
     }
+  } forEach: {
+    fragment
   }
   "\"".utf8
 }
@@ -166,7 +166,7 @@ private let boolean = Bool.parser(of: Input.self)
 
 // MARK: Null
 
-private let null = StartsWith<Input>("null".utf8)
+private let null = Parse { "null".utf8 }
   .map { JSON.null }
 
 let jsonSuite = BenchmarkSuite(name: "JSON") { suite in
