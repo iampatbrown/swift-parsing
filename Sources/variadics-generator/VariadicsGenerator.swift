@@ -127,6 +127,13 @@ struct VariadicsGenerator: ParsableCommand {
       outputForEach(permutation.captureIndices, separator: ", ") { "o\($0)" }
       output(")\n  }\n}\n\n")
 
+      // Emit parserDebugDescription
+      // Could probably replace with "extension \(typeName): ZipParserDebugStringConvertible {}"
+      output("extension \(typeName): ParserDebugStringConvertible {\n")
+      output("  public var parserDebugDescription: String {\n")
+      output("    \"Zip<\\(Input.self), \\(Output.self)>\"\n")
+      output("  }\n}\n\n")
+
       // Emit builders.
       output("extension ParserBuilder {\n")
       output("  @inlinable public static func buildBlock<")
@@ -167,6 +174,14 @@ struct VariadicsGenerator: ParsableCommand {
       "if let output = self.p\($0).parse(&input) { return output }"
     }
     output("\n    return nil\n  }\n}\n\n")
+
+    // Emit parserDebugDescription
+    output("extension \(typeName): ParserDebugStringConvertible {\n")
+    output("  public var parserDebugDescription: String {\n")
+    output("    \"OneOf<\\(Input.self), \\(Output.self)>(")
+    outputForEach(0..<arity, separator: ", ") { "\\(parserDebug(for: self.p\($0)))" }
+    output(")\"\n  }\n}\n\n")
+
 
     // Emit builders.
     output("extension OneOfBuilder {\n")

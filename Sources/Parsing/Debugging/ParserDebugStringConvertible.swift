@@ -158,6 +158,12 @@ extension Newline: ParserDebugStringConvertible {
   }
 }
 
+extension Parse: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "\(parserDebug(for: self.upstream))"
+  }
+}
+
 extension Parsers.OneOf: ParserDebugStringConvertible {
   public var parserDebugDescription: String {
     "OneOf<\(Input.self), \(Output.self)>(\(parserDebug(for: self.a)), \(parserDebug(for: self.b)))"
@@ -167,6 +173,30 @@ extension Parsers.OneOf: ParserDebugStringConvertible {
 extension OneOfMany: ParserDebugStringConvertible {
   public var parserDebugDescription: String {
     "OneOfMany<\(Input.self), \(Output.self)>(\(self.parsers.map(parserDebug).joined(separator: ", ")))"
+  }
+}
+
+extension OneOf: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "\(parserDebug(for: self.upstream))"
+  }
+}
+
+extension Optionally: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Optionally { \(parserDebug(for: self.upstream)) }"
+  }
+}
+
+extension Parsers.OptionalParser: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Optionally { \(parserDebug(for: self.upstream)) }"
+  }
+}
+
+extension Parsers.Pipe: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Pipe<\(parserDebug(for: self.upstream)), \(parserDebug(for: self.downstream))>"
   }
 }
 
@@ -188,8 +218,40 @@ extension PrefixThrough: ParserDebugStringConvertible {
   }
 }
 
+extension Parsers.Pullback: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Pullback<\(Input.self), \(parserDebug(for: self.downstream))>"
+  }
+}
+
+extension Rest: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Rest<\(Input.self)>"
+  }
+}
+
 extension Skip: ParserDebugStringConvertible {
   public var parserDebugDescription: String {
     "Skip { \(parserDebug(for: self.upstream)) }"
+  }
+}
+
+extension StartsWith: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "StartsWith<\(Input.self)>(\(self.possiblePrefix.map(parserDebug).joined()))" // TODO: not really going to work
+  }
+}
+
+extension Parsers.Stream: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Stream<\(parserDebug(for: self.upstream))>"
+  }
+}
+
+// TODO: Take?
+
+extension Whitespace: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Whitespace<\(Input.self)>"
   }
 }

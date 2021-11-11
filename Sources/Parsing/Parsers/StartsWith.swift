@@ -25,7 +25,7 @@ where
   Input.SubSequence == Input
 {
   public let count: Int
-//  public let possiblePrefix: AnyCollection<Input.Element>
+  public let possiblePrefix: AnyCollection<Input.Element>
   public let startsWith: (Input) -> Bool
 
   /// Initializes a parser that successfully returns `Void` when the initial elements of its input
@@ -46,7 +46,7 @@ where
     PossiblePrefix.Element == Input.Element
   {
     self.count = possiblePrefix.count
-//    self.possiblePrefix = AnyCollection(possiblePrefix)
+    self.possiblePrefix = AnyCollection(possiblePrefix)
     self.startsWith = { input in input.starts(with: possiblePrefix, by: areEquivalent) }
   }
 

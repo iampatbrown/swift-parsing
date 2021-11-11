@@ -29,6 +29,12 @@ where
   }
 }
 
+extension Zip2_OO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1>(
     _ p0: P0, _ p1: P1
@@ -63,6 +69,12 @@ where
       return nil
     }
     return (o0)
+  }
+}
+
+extension Zip2_OV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -103,6 +115,12 @@ where
   }
 }
 
+extension Zip2_VO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1>(
     _ p0: P0, _ p1: P1
@@ -127,7 +145,7 @@ where
   }
 
   @inlinable public func parse(_ input: inout P0.Input) -> (
-    
+
   )? {
     let original = input
     guard
@@ -138,6 +156,12 @@ where
       return nil
     }
     return ()
+  }
+}
+
+extension Zip2_VV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -183,6 +207,12 @@ where
   }
 }
 
+extension Zip3_OOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2>(
     _ p0: P0, _ p1: P1, _ p2: P2
@@ -222,6 +252,12 @@ where
       return nil
     }
     return (o0, o1)
+  }
+}
+
+extension Zip3_OOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -267,6 +303,12 @@ where
   }
 }
 
+extension Zip3_OVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2>(
     _ p0: P0, _ p1: P1, _ p2: P2
@@ -306,6 +348,12 @@ where
       return nil
     }
     return (o0)
+  }
+}
+
+extension Zip3_OVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -351,6 +399,12 @@ where
   }
 }
 
+extension Zip3_VOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2>(
     _ p0: P0, _ p1: P1, _ p2: P2
@@ -390,6 +444,12 @@ where
       return nil
     }
     return (o1)
+  }
+}
+
+extension Zip3_VOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -435,6 +495,12 @@ where
   }
 }
 
+extension Zip3_VVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2>(
     _ p0: P0, _ p1: P1, _ p2: P2
@@ -463,7 +529,7 @@ where
   }
 
   @inlinable public func parse(_ input: inout P0.Input) -> (
-    
+
   )? {
     let original = input
     guard
@@ -475,6 +541,12 @@ where
       return nil
     }
     return ()
+  }
+}
+
+extension Zip3_VVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -525,6 +597,12 @@ where
   }
 }
 
+extension Zip4_OOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3
@@ -569,6 +647,12 @@ where
       return nil
     }
     return (o0, o1, o2)
+  }
+}
+
+extension Zip4_OOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -619,6 +703,12 @@ where
   }
 }
 
+extension Zip4_OOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3
@@ -663,6 +753,12 @@ where
       return nil
     }
     return (o0, o1)
+  }
+}
+
+extension Zip4_OOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -713,6 +809,12 @@ where
   }
 }
 
+extension Zip4_OVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3
@@ -757,6 +859,12 @@ where
       return nil
     }
     return (o0, o2)
+  }
+}
+
+extension Zip4_OVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -807,6 +915,12 @@ where
   }
 }
 
+extension Zip4_OVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3
@@ -851,6 +965,12 @@ where
       return nil
     }
     return (o0)
+  }
+}
+
+extension Zip4_OVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -901,6 +1021,12 @@ where
   }
 }
 
+extension Zip4_VOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3
@@ -945,6 +1071,12 @@ where
       return nil
     }
     return (o1, o2)
+  }
+}
+
+extension Zip4_VOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -995,6 +1127,12 @@ where
   }
 }
 
+extension Zip4_VOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3
@@ -1039,6 +1177,12 @@ where
       return nil
     }
     return (o1)
+  }
+}
+
+extension Zip4_VOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -1089,6 +1233,12 @@ where
   }
 }
 
+extension Zip4_VVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3
@@ -1133,6 +1283,12 @@ where
       return nil
     }
     return (o2)
+  }
+}
+
+extension Zip4_VVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -1183,6 +1339,12 @@ where
   }
 }
 
+extension Zip4_VVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3
@@ -1215,7 +1377,7 @@ where
   }
 
   @inlinable public func parse(_ input: inout P0.Input) -> (
-    
+
   )? {
     let original = input
     guard
@@ -1228,6 +1390,12 @@ where
       return nil
     }
     return ()
+  }
+}
+
+extension Zip4_VVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -1283,6 +1451,12 @@ where
   }
 }
 
+extension Zip5_OOOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -1332,6 +1506,12 @@ where
       return nil
     }
     return (o0, o1, o2, o3)
+  }
+}
+
+extension Zip5_OOOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -1387,6 +1567,12 @@ where
   }
 }
 
+extension Zip5_OOOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -1436,6 +1622,12 @@ where
       return nil
     }
     return (o0, o1, o2)
+  }
+}
+
+extension Zip5_OOOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -1491,6 +1683,12 @@ where
   }
 }
 
+extension Zip5_OOVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -1540,6 +1738,12 @@ where
       return nil
     }
     return (o0, o1, o3)
+  }
+}
+
+extension Zip5_OOVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -1595,6 +1799,12 @@ where
   }
 }
 
+extension Zip5_OOVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -1644,6 +1854,12 @@ where
       return nil
     }
     return (o0, o1)
+  }
+}
+
+extension Zip5_OOVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -1699,6 +1915,12 @@ where
   }
 }
 
+extension Zip5_OVOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -1748,6 +1970,12 @@ where
       return nil
     }
     return (o0, o2, o3)
+  }
+}
+
+extension Zip5_OVOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -1803,6 +2031,12 @@ where
   }
 }
 
+extension Zip5_OVOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -1852,6 +2086,12 @@ where
       return nil
     }
     return (o0, o2)
+  }
+}
+
+extension Zip5_OVOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -1907,6 +2147,12 @@ where
   }
 }
 
+extension Zip5_OVVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -1956,6 +2202,12 @@ where
       return nil
     }
     return (o0, o3)
+  }
+}
+
+extension Zip5_OVVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -2011,6 +2263,12 @@ where
   }
 }
 
+extension Zip5_OVVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -2060,6 +2318,12 @@ where
       return nil
     }
     return (o0)
+  }
+}
+
+extension Zip5_OVVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -2115,6 +2379,12 @@ where
   }
 }
 
+extension Zip5_VOOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -2164,6 +2434,12 @@ where
       return nil
     }
     return (o1, o2, o3)
+  }
+}
+
+extension Zip5_VOOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -2219,6 +2495,12 @@ where
   }
 }
 
+extension Zip5_VOOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -2268,6 +2550,12 @@ where
       return nil
     }
     return (o1, o2)
+  }
+}
+
+extension Zip5_VOOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -2323,6 +2611,12 @@ where
   }
 }
 
+extension Zip5_VOVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -2372,6 +2666,12 @@ where
       return nil
     }
     return (o1, o3)
+  }
+}
+
+extension Zip5_VOVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -2427,6 +2727,12 @@ where
   }
 }
 
+extension Zip5_VOVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -2476,6 +2782,12 @@ where
       return nil
     }
     return (o1)
+  }
+}
+
+extension Zip5_VOVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -2531,6 +2843,12 @@ where
   }
 }
 
+extension Zip5_VVOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -2580,6 +2898,12 @@ where
       return nil
     }
     return (o2, o3)
+  }
+}
+
+extension Zip5_VVOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -2635,6 +2959,12 @@ where
   }
 }
 
+extension Zip5_VVOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -2684,6 +3014,12 @@ where
       return nil
     }
     return (o2)
+  }
+}
+
+extension Zip5_VVOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -2739,6 +3075,12 @@ where
   }
 }
 
+extension Zip5_VVVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -2788,6 +3130,12 @@ where
       return nil
     }
     return (o3)
+  }
+}
+
+extension Zip5_VVVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -2843,6 +3191,12 @@ where
   }
 }
 
+extension Zip5_VVVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4
@@ -2879,7 +3233,7 @@ where
   }
 
   @inlinable public func parse(_ input: inout P0.Input) -> (
-    
+
   )? {
     let original = input
     guard
@@ -2893,6 +3247,12 @@ where
       return nil
     }
     return ()
+  }
+}
+
+extension Zip5_VVVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -2953,6 +3313,12 @@ where
   }
 }
 
+extension Zip6_OOOOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -3007,6 +3373,12 @@ where
       return nil
     }
     return (o0, o1, o2, o3, o4)
+  }
+}
+
+extension Zip6_OOOOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -3067,6 +3439,12 @@ where
   }
 }
 
+extension Zip6_OOOOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -3121,6 +3499,12 @@ where
       return nil
     }
     return (o0, o1, o2, o3)
+  }
+}
+
+extension Zip6_OOOOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -3181,6 +3565,12 @@ where
   }
 }
 
+extension Zip6_OOOVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -3235,6 +3625,12 @@ where
       return nil
     }
     return (o0, o1, o2, o4)
+  }
+}
+
+extension Zip6_OOOVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -3295,6 +3691,12 @@ where
   }
 }
 
+extension Zip6_OOOVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -3349,6 +3751,12 @@ where
       return nil
     }
     return (o0, o1, o2)
+  }
+}
+
+extension Zip6_OOOVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -3409,6 +3817,12 @@ where
   }
 }
 
+extension Zip6_OOVOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -3463,6 +3877,12 @@ where
       return nil
     }
     return (o0, o1, o3, o4)
+  }
+}
+
+extension Zip6_OOVOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -3523,6 +3943,12 @@ where
   }
 }
 
+extension Zip6_OOVOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -3577,6 +4003,12 @@ where
       return nil
     }
     return (o0, o1, o3)
+  }
+}
+
+extension Zip6_OOVOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -3637,6 +4069,12 @@ where
   }
 }
 
+extension Zip6_OOVVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -3691,6 +4129,12 @@ where
       return nil
     }
     return (o0, o1, o4)
+  }
+}
+
+extension Zip6_OOVVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -3751,6 +4195,12 @@ where
   }
 }
 
+extension Zip6_OOVVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -3805,6 +4255,12 @@ where
       return nil
     }
     return (o0, o1)
+  }
+}
+
+extension Zip6_OOVVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -3865,6 +4321,12 @@ where
   }
 }
 
+extension Zip6_OVOOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -3919,6 +4381,12 @@ where
       return nil
     }
     return (o0, o2, o3, o4)
+  }
+}
+
+extension Zip6_OVOOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -3979,6 +4447,12 @@ where
   }
 }
 
+extension Zip6_OVOOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -4033,6 +4507,12 @@ where
       return nil
     }
     return (o0, o2, o3)
+  }
+}
+
+extension Zip6_OVOOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -4093,6 +4573,12 @@ where
   }
 }
 
+extension Zip6_OVOVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -4147,6 +4633,12 @@ where
       return nil
     }
     return (o0, o2, o4)
+  }
+}
+
+extension Zip6_OVOVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -4207,6 +4699,12 @@ where
   }
 }
 
+extension Zip6_OVOVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -4261,6 +4759,12 @@ where
       return nil
     }
     return (o0, o2)
+  }
+}
+
+extension Zip6_OVOVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -4321,6 +4825,12 @@ where
   }
 }
 
+extension Zip6_OVVOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -4375,6 +4885,12 @@ where
       return nil
     }
     return (o0, o3, o4)
+  }
+}
+
+extension Zip6_OVVOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -4435,6 +4951,12 @@ where
   }
 }
 
+extension Zip6_OVVOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -4489,6 +5011,12 @@ where
       return nil
     }
     return (o0, o3)
+  }
+}
+
+extension Zip6_OVVOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -4549,6 +5077,12 @@ where
   }
 }
 
+extension Zip6_OVVVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -4603,6 +5137,12 @@ where
       return nil
     }
     return (o0, o4)
+  }
+}
+
+extension Zip6_OVVVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -4663,6 +5203,12 @@ where
   }
 }
 
+extension Zip6_OVVVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -4717,6 +5263,12 @@ where
       return nil
     }
     return (o0)
+  }
+}
+
+extension Zip6_OVVVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -4777,6 +5329,12 @@ where
   }
 }
 
+extension Zip6_VOOOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -4831,6 +5389,12 @@ where
       return nil
     }
     return (o1, o2, o3, o4)
+  }
+}
+
+extension Zip6_VOOOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -4891,6 +5455,12 @@ where
   }
 }
 
+extension Zip6_VOOOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -4945,6 +5515,12 @@ where
       return nil
     }
     return (o1, o2, o3)
+  }
+}
+
+extension Zip6_VOOOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -5005,6 +5581,12 @@ where
   }
 }
 
+extension Zip6_VOOVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -5059,6 +5641,12 @@ where
       return nil
     }
     return (o1, o2, o4)
+  }
+}
+
+extension Zip6_VOOVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -5119,6 +5707,12 @@ where
   }
 }
 
+extension Zip6_VOOVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -5173,6 +5767,12 @@ where
       return nil
     }
     return (o1, o2)
+  }
+}
+
+extension Zip6_VOOVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -5233,6 +5833,12 @@ where
   }
 }
 
+extension Zip6_VOVOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -5287,6 +5893,12 @@ where
       return nil
     }
     return (o1, o3, o4)
+  }
+}
+
+extension Zip6_VOVOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -5347,6 +5959,12 @@ where
   }
 }
 
+extension Zip6_VOVOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -5401,6 +6019,12 @@ where
       return nil
     }
     return (o1, o3)
+  }
+}
+
+extension Zip6_VOVOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -5461,6 +6085,12 @@ where
   }
 }
 
+extension Zip6_VOVVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -5515,6 +6145,12 @@ where
       return nil
     }
     return (o1, o4)
+  }
+}
+
+extension Zip6_VOVVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -5575,6 +6211,12 @@ where
   }
 }
 
+extension Zip6_VOVVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -5629,6 +6271,12 @@ where
       return nil
     }
     return (o1)
+  }
+}
+
+extension Zip6_VOVVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -5689,6 +6337,12 @@ where
   }
 }
 
+extension Zip6_VVOOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -5743,6 +6397,12 @@ where
       return nil
     }
     return (o2, o3, o4)
+  }
+}
+
+extension Zip6_VVOOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -5803,6 +6463,12 @@ where
   }
 }
 
+extension Zip6_VVOOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -5857,6 +6523,12 @@ where
       return nil
     }
     return (o2, o3)
+  }
+}
+
+extension Zip6_VVOOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -5917,6 +6589,12 @@ where
   }
 }
 
+extension Zip6_VVOVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -5971,6 +6649,12 @@ where
       return nil
     }
     return (o2, o4)
+  }
+}
+
+extension Zip6_VVOVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -6031,6 +6715,12 @@ where
   }
 }
 
+extension Zip6_VVOVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -6085,6 +6775,12 @@ where
       return nil
     }
     return (o2)
+  }
+}
+
+extension Zip6_VVOVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -6145,6 +6841,12 @@ where
   }
 }
 
+extension Zip6_VVVOOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -6199,6 +6901,12 @@ where
       return nil
     }
     return (o3, o4)
+  }
+}
+
+extension Zip6_VVVOOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -6259,6 +6967,12 @@ where
   }
 }
 
+extension Zip6_VVVOVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -6313,6 +7027,12 @@ where
       return nil
     }
     return (o3)
+  }
+}
+
+extension Zip6_VVVOVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -6373,6 +7093,12 @@ where
   }
 }
 
+extension Zip6_VVVVOO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -6427,6 +7153,12 @@ where
       return nil
     }
     return (o4)
+  }
+}
+
+extension Zip6_VVVVOV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -6487,6 +7219,12 @@ where
   }
 }
 
+extension Zip6_VVVVVO: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
+  }
+}
+
 extension ParserBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5
@@ -6527,7 +7265,7 @@ where
   }
 
   @inlinable public func parse(_ input: inout P0.Input) -> (
-    
+
   )? {
     let original = input
     guard
@@ -6542,6 +7280,12 @@ where
       return nil
     }
     return ()
+  }
+}
+
+extension Zip6_VVVVVV: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "Zip<\(Input.self), \(Output.self)>"
   }
 }
 
@@ -6571,6 +7315,12 @@ where
     if let output = self.p0.parse(&input) { return output }
     if let output = self.p1.parse(&input) { return output }
     return nil
+  }
+}
+
+extension OneOf2: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "OneOf<\(Input.self), \(Output.self)>(\(parserDebug(for: self.p0)), \(parserDebug(for: self.p1)))"
   }
 }
 
@@ -6605,6 +7355,12 @@ where
     if let output = self.p1.parse(&input) { return output }
     if let output = self.p2.parse(&input) { return output }
     return nil
+  }
+}
+
+extension OneOf3: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "OneOf<\(Input.self), \(Output.self)>(\(parserDebug(for: self.p0)), \(parserDebug(for: self.p1)), \(parserDebug(for: self.p2)))"
   }
 }
 
@@ -6644,6 +7400,12 @@ where
     if let output = self.p2.parse(&input) { return output }
     if let output = self.p3.parse(&input) { return output }
     return nil
+  }
+}
+
+extension OneOf4: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "OneOf<\(Input.self), \(Output.self)>(\(parserDebug(for: self.p0)), \(parserDebug(for: self.p1)), \(parserDebug(for: self.p2)), \(parserDebug(for: self.p3)))"
   }
 }
 
@@ -6688,6 +7450,12 @@ where
     if let output = self.p3.parse(&input) { return output }
     if let output = self.p4.parse(&input) { return output }
     return nil
+  }
+}
+
+extension OneOf5: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "OneOf<\(Input.self), \(Output.self)>(\(parserDebug(for: self.p0)), \(parserDebug(for: self.p1)), \(parserDebug(for: self.p2)), \(parserDebug(for: self.p3)), \(parserDebug(for: self.p4)))"
   }
 }
 
@@ -6737,6 +7505,12 @@ where
     if let output = self.p4.parse(&input) { return output }
     if let output = self.p5.parse(&input) { return output }
     return nil
+  }
+}
+
+extension OneOf6: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "OneOf<\(Input.self), \(Output.self)>(\(parserDebug(for: self.p0)), \(parserDebug(for: self.p1)), \(parserDebug(for: self.p2)), \(parserDebug(for: self.p3)), \(parserDebug(for: self.p4)), \(parserDebug(for: self.p5)))"
   }
 }
 
@@ -6791,6 +7565,12 @@ where
     if let output = self.p5.parse(&input) { return output }
     if let output = self.p6.parse(&input) { return output }
     return nil
+  }
+}
+
+extension OneOf7: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "OneOf<\(Input.self), \(Output.self)>(\(parserDebug(for: self.p0)), \(parserDebug(for: self.p1)), \(parserDebug(for: self.p2)), \(parserDebug(for: self.p3)), \(parserDebug(for: self.p4)), \(parserDebug(for: self.p5)), \(parserDebug(for: self.p6)))"
   }
 }
 
@@ -6850,6 +7630,12 @@ where
     if let output = self.p6.parse(&input) { return output }
     if let output = self.p7.parse(&input) { return output }
     return nil
+  }
+}
+
+extension OneOf8: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "OneOf<\(Input.self), \(Output.self)>(\(parserDebug(for: self.p0)), \(parserDebug(for: self.p1)), \(parserDebug(for: self.p2)), \(parserDebug(for: self.p3)), \(parserDebug(for: self.p4)), \(parserDebug(for: self.p5)), \(parserDebug(for: self.p6)), \(parserDebug(for: self.p7)))"
   }
 }
 
@@ -6917,6 +7703,12 @@ where
   }
 }
 
+extension OneOf9: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "OneOf<\(Input.self), \(Output.self)>(\(parserDebug(for: self.p0)), \(parserDebug(for: self.p1)), \(parserDebug(for: self.p2)), \(parserDebug(for: self.p3)), \(parserDebug(for: self.p4)), \(parserDebug(for: self.p5)), \(parserDebug(for: self.p6)), \(parserDebug(for: self.p7)), \(parserDebug(for: self.p8)))"
+  }
+}
+
 extension OneOfBuilder {
   @inlinable public static func buildBlock<P0, P1, P2, P3, P4, P5, P6, P7, P8>(
     _ p0: P0, _ p1: P1, _ p2: P2, _ p3: P3, _ p4: P4, _ p5: P5, _ p6: P6, _ p7: P7, _ p8: P8
@@ -6925,4 +7717,4 @@ extension OneOfBuilder {
   }
 }
 
-// END AUTO-GENERATED CONTENT
+// END AUTO-GENERATED CONTENTProgram ended with exit code: 0
