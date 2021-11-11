@@ -13,8 +13,8 @@ func printOutput() {
 final class TraceTests: XCTestCase {
   func testTraceGood() {
     var input = "42 Hello, world!"[...]
-//    _ = Prefix(while: { $0.isNumber }).signpost().parse(&input)
-    _ = Prefix(while: { $0.isNumber }).signpost().parse(&input)
+    _ = Prefix(while: { $0.isNumber }).trace().parse(&input)
+//    _ = Prefix(while: { $0.isNumber }).trace().parse(&input)
 
     printOutput()
   }
@@ -22,7 +22,7 @@ final class TraceTests: XCTestCase {
   func testTraceBad() {
     var input = "42 Hello, world!"[...]
 
-    _ = Prefix(100...).signpost().parse(&input)
+    _ = Prefix(100...).trace().parse(&input)
 
     printOutput()
   }
@@ -31,17 +31,17 @@ final class TraceTests: XCTestCase {
     var input = "42 Hello, world!"[...]
     _ = Parse {
       OneOf {
-        PrefixUpTo("Goodbye").signpost()
+        PrefixUpTo("Goodbye").trace()
 
-        Prefix(while: { $0.isNumber }).signpost()
-      }.signpost()
+        Prefix(while: { $0.isNumber }).trace()
+      }.trace()
 
       Skip {
         Prefix(while: { $0 == " " })
-      }.signpost()
+      }.trace()
 
-      Rest().signpost()
-    }.signpost()
+      Rest().trace()
+    }.trace()
       .parse(&input)
 
     printOutput()
@@ -60,7 +60,7 @@ final class TraceTests: XCTestCase {
         Prefix(while: { $0 == " " })
       }.trace("skip whitespace")
 
-      Rest().signpost().trace("rest")
+      Rest().trace().trace("rest")
     }.trace("root")
       .parse(&input)
 

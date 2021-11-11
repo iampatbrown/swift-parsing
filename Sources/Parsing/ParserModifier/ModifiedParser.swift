@@ -1,24 +1,13 @@
-public struct ModifiedParser<Upstream, Modifier>: Parser
-  where
-  Upstream: Parser,
-  Modifier: ParserModifier,
-  Upstream.Input == Modifier.Upstream.Input,
-  Upstream.Output == Modifier.Upstream.Output
-{
-  @usableFromInline
-  let upstream: AnyParser<Upstream.Input, Upstream.Output>
+public protocol ModifiedParser: Parser where Input == Body.Input, Output == Body.Output {
+  associatedtype Body: Parser
+  associatedtype Upstream: Parser
+  var upstream: Upstream { get }
+  @ParserBuilder var body: Body { get }
+}
 
-  @usableFromInline
-  let modifier: Modifier
-
-  @usableFromInline
-  internal init(upstream: Upstream, modifier: Modifier) {
-    self.upstream = upstream.eraseToAnyParser()
-    self.modifier = modifier
-  }
-
+extension ModifiedParser {
   @inlinable @inline(__always)
-  public func parse(_ input: inout Modifier.Body.Input) -> Modifier.Body.Output? {
-    self.modifier.body(upstream: self.upstream).parse(&input)
+  public func parse(_ input: inout Body.Input) -> Body.Output? {
+    self.body.parse(&input)
   }
 }
