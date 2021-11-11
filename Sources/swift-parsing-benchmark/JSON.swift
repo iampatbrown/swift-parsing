@@ -29,21 +29,22 @@ private var json: AnyParser<Input, JSON> {
   Parse {
     Skip {
       Whitespace()
-    }
+    }.signpost("Skip Whitespace")
 
     OneOf {
-      object
-      array
-      string
-      number
-      boolean
-      null
-    }
+      object.signpost("object")
+      array.signpost("array")
+      string.signpost("string")
+      number.signpost("number")
+      boolean.signpost("boolean")
+      null.signpost("null")
+    }.signpost("OneOf")
 
     Skip {
       Whitespace()
-    }
+    }.signpost("Skip Whitespace")
   }
+  .signpost("JSON")
   .eraseToAnyParser()
 }
 
@@ -223,4 +224,21 @@ let jsonSuite = BenchmarkSuite(name: "JSON") { suite in
       )
     }
   )
+}
+
+func parseJson() {
+  let input = #"""
+    {
+      "hello": true,
+      "goodbye": 42.42,
+      "whatever": null,
+      "xs": [1, "hello", null, false],
+      "ys": {
+        "0": 2,
+        "1": "goodbye"
+      }
+    }
+    """#
+
+  _ = json.parse(input)
 }

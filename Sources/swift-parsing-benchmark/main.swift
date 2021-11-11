@@ -1,8 +1,8 @@
 import Benchmark
 import Parsing
 
-Benchmark.main(
-  [
+// Benchmark.main(
+//  [
 //    defaultBenchmarkSuite,
 //    arithmeticSuite,
 //    binaryDataSuite,
@@ -20,9 +20,8 @@ Benchmark.main(
 //    stringAbstractionsSuite,
 //    uuidSuite,
 //    xcodeLogsSuite,
-    xmlSuite
-  ]
-)
+//    xmlSuite
+//  ]
+// )
 
-
-
+parseJson()
