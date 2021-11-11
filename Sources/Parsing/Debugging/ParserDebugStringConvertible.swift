@@ -5,16 +5,26 @@ public protocol ParserDebugStringConvertible {
 }
 
 func parserDebug(for subject: Any) -> String {
-  (subject as? ParserDebugStringConvertible)?.parserDebugDescription ?? String(describing: subject)
+  if let subject = subject as? ParserDebugStringConvertible {
+    return subject.parserDebugDescription
+  } else {
+    return String(describing: subject)
+  }
 }
 
 func rangeDescription(min: Int, max: Int?) -> String {
   switch (min, max) {
   case (_, min): return "\(min)"
-  case (0, nil): return "..."
+  case (0, nil): return ""
   case let (0, .some(max)): return "...\(max)"
   case (_, nil): return "\(min)..."
   case let (_, .some(max)): return "\(min)...\(max)"
+  }
+}
+
+extension TracedParser: ParserDebugStringConvertible {
+  public var parserDebugDescription: String {
+    "\(parserDebug(for: self.upstream))"
   }
 }
 
@@ -202,7 +212,9 @@ extension Parsers.Pipe: ParserDebugStringConvertible {
 
 extension Prefix: ParserDebugStringConvertible {
   public var parserDebugDescription: String {
-    "Prefix<\(Input.self)>(\(rangeDescription(min: self.minLength, max: self.maxLength))\(self.predicate != nil ? ", while: _" : ""))"
+    let range = rangeDescription(min: self.minLength, max: self.maxLength)
+    return "Prefix<\(Input.self)>("
+      + "\(range)\(self.predicate != nil ? "\(!range.isEmpty ? ", " : "")while:" : ""))"
   }
 }
 

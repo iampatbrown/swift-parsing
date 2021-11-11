@@ -67,8 +67,7 @@ public struct Trace {
     to target: inout TargetStream
   ) where TargetStream: TextOutputStream {
     for event in self.events {
-      let indentation = String(repeating: " ", count: event.depth * 2)
-      target.write("\(indentation)\(event)\n")
+      target.write("\(event.debugDescription.indent(by: event.depth * 2))\n")
     }
   }
 
@@ -95,5 +94,12 @@ public struct Trace {
     set {
       Self.traces[groupID] = newValue
     }
+  }
+}
+
+extension String {
+  func indent(by indent: Int) -> String {
+    let indentation = String(repeating: " ", count: indent)
+    return indentation + self.replacingOccurrences(of: "\n", with: "\n\(indentation)")
   }
 }

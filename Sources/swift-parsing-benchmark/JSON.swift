@@ -29,22 +29,22 @@ private var json: AnyParser<Input, JSON> {
   Parse {
     Skip {
       Whitespace()
-    }.signpost("Skip Whitespace")
+    }.trace()
 
     OneOf {
-      object.signpost("object")
-      array.signpost("array")
-      string.signpost("string")
-      number.signpost("number")
-      boolean.signpost("boolean")
-      null.signpost("null")
-    }.signpost("OneOf")
+      object.trace()
+      array.trace()
+      string.trace()
+      number.trace()
+      boolean.trace()
+      null.trace()
+    }.trace()
 
     Skip {
       Whitespace()
-    }.signpost("Skip Whitespace")
+    }.trace()
   }
-  .signpost("JSON")
+  .trace("JSON")
   .eraseToAnyParser()
 }
 
@@ -241,4 +241,5 @@ func parseJson() {
     """#
 
   _ = json.parse(input)
+  Trace.default.print()
 }

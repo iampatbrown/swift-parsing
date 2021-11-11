@@ -32,11 +32,12 @@ public struct TraceEvent: CustomDebugStringConvertible {
   public var debugDescription: String {
     switch self.type {
     case .start:
-      return "\(self.parserID)\tInput(\(parserDebug(for: self.input)))"
+      return "\(self.parserID)\t\tInput(\(parserDebug(for: self.input).debugDescription))\n"
     case .fail:
-      return "-> Fail@\(self.file):\(self.line)"
+      return "-> Fail@\(self.file):\(self.line)\n"
     case let .success(output):
-      return "-> Output(\(parserDebug(for: output)))"
+      return "-> Output(\(parserDebug(for: output).debugDescription))\n"
     }
   }
 }
+
