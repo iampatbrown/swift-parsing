@@ -13,7 +13,7 @@ public struct TracedParser<Upstream>: ModifiedParser where Upstream: Parser {
     line: UInt = #line
   ) {
     self.upstream = upstream
-    self.parserID = parserID ?? String("\(type(of: upstream))".prefix(while: { $0 != "<" }))
+    self.parserID = parserID ?? parserDebug(for: upstream)
     self.groupID = groupID
     self.file = file
     self.line = line
@@ -33,6 +33,8 @@ public struct TracedParser<Upstream>: ModifiedParser where Upstream: Parser {
     }
   }
 }
+
+
 
 extension Parser {
   public func trace(

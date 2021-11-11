@@ -1,4 +1,4 @@
-public struct TraceEvent: CustomStringConvertible {
+public struct TraceEvent: CustomDebugStringConvertible {
   var parserID: String
   var input: Any
   var depth: Int
@@ -29,15 +29,14 @@ public struct TraceEvent: CustomStringConvertible {
     self.line = line
   }
 
-  public var description: String {
-    let indentation = String(repeating: " ", count: self.depth * 2)
+  public var debugDescription: String {
     switch self.type {
     case .start:
-      return "\(indentation)\(self.parserID)\tInput(\(self.input))"
+      return "\(self.parserID)\tInput(\(parserDebug(for: self.input)))"
     case .fail:
-      return "\(indentation)-> Fail@\(self.file):\(self.line)"
+      return "-> Fail@\(self.file):\(self.line)"
     case let .success(output):
-      return "\(indentation)-> Output(\(output))"
+      return "-> Output(\(parserDebug(for: output)))"
     }
   }
 }

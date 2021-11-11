@@ -67,7 +67,8 @@ public struct Trace {
     to target: inout TargetStream
   ) where TargetStream: TextOutputStream {
     for event in self.events {
-      target.write("\(event)\n")
+      let indentation = String(repeating: " ", count: event.depth * 2)
+      target.write("\(indentation)\(event)\n")
     }
   }
 
