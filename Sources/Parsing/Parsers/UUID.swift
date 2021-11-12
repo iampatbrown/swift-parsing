@@ -47,7 +47,7 @@ extension Parsers {
   /// You will not typically need to interact with this type directly. Instead you will usually use
   /// `UUID.parser()`, which constructs this type.
   public struct UUIDParser<Input>: Parser
-  where
+    where
     Input: Collection,
     Input.SubSequence == Input,
     Input.Element == UTF8.CodeUnit
@@ -138,5 +138,35 @@ extension Parsers {
     public func parse(_ input: inout Substring) -> UUID? {
       self.parser.parse(&input.utf8)
     }
+  }
+}
+
+extension Parsers.UUIDParser: Printer where Input: RangeReplaceableCollection {
+  public func print(_ output: UUID) -> Input? {
+    let bytes = output.uuid
+    return Input([
+      bytes.0,
+      bytes.1,
+      bytes.2,
+      bytes.3,
+      bytes.4,
+      bytes.5,
+      bytes.6,
+      bytes.7,
+      bytes.8,
+      bytes.9,
+      bytes.10,
+      bytes.11,
+      bytes.12,
+      bytes.13,
+      bytes.14,
+      bytes.15,
+    ])
+  }
+}
+
+extension Parsers.SubstringUUIDParser: Printer {
+  public func print(_ output: UUID) -> Substring? {
+    output.uuidString[...]
   }
 }

@@ -36,43 +36,43 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
   }
 
   let router = OneOf {
-    Routing(Route.home) {
+    Routing(/Route.home) {
       Method.get
     }
 
-    Routing(Route.contactUs) {
+    Routing(/Route.contactUs) {
       Method.get
       Path(FromUTF8View { "contact-us".utf8 })
     }
 
-    Routing(Route.episodes) {
+    Routing(/Route.episodes) {
       Path(FromUTF8View { "episodes".utf8 })
 
       OneOf {
-        Routing(Route.Episodes.index) {
+        Routing(/Route.Episodes.index) {
           Method.get
         }
 
-        Routing(Route.Episodes.episode) {
+        Routing(/Route.Episodes.episode) {
           Path(FromUTF8View { Int.parser() })
 
           OneOf {
-            Routing(Route.Episode.show) {
+            Routing(/Route.Episode.show) {
               Method.get
             }
 
-            Routing(Route.Episode.comments) {
+            Routing(/Route.Episode.comments) {
               Path(FromUTF8View { "comments".utf8 })
 
               OneOf {
-                Routing(Route.Episode.Comments.post) {
+                Routing(/Route.Episode.Comments.post) {
                   Method.post
                   Body {
                     JSON(Route.Episode.Comments.Comment.self)
                   }
                 }
 
-                Routing(Route.Episode.Comments.show) {
+                Routing(/Route.Episode.Comments.show) {
                   Method.get
                   Query("count", Int.parser(), default: 10)
                 }
@@ -87,8 +87,8 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
   var postRequest = URLRequest(url: URL(string: "/episodes/1/comments")!)
   postRequest.httpMethod = "POST"
   postRequest.httpBody = Data("""
-    {"commenter": "Blob", "message": "Hi!"}
-    """.utf8)
+  {"commenter": "Blob", "message": "Hi!"}
+  """.utf8)
   let requests = [
     URLRequest(url: URL(string: "/")!),
     URLRequest(url: URL(string: "/contact-us")!),

@@ -30,3 +30,5 @@ where
 extension Parsers {
   public typealias Newline = Parsing.Newline  // NB: Convenience type alias for discovery
 }
+
+// TODO: Can Newline be printed? 

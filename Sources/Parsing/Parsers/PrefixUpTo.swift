@@ -72,3 +72,11 @@ extension PrefixUpTo where Input == Substring.UTF8View {
     self.init(String(possibleMatch)[...].utf8)
   }
 }
+
+// TODO: Are these the same as Prefix?
+extension PrefixUpTo: Printer {
+  public func print(_ output: Input) -> Input? {
+    var output = output
+    return self.skip(End()).parse(&output)
+  }
+}

@@ -1,3 +1,4 @@
+import CasePaths
 import Foundation
 
 public struct URLRequestData {
@@ -22,8 +23,27 @@ public struct URLRequestData {
   }
 }
 
+extension URLRequestData: Appendable {
+  // self.init() could probably be used
+  public init() {
+    self.method = nil
+    self.path = []
+    self.query = [:]
+    self.headers = [:]
+    self.body = nil
+  }
+
+  public mutating func append(contentsOf other: URLRequestData) {
+    self.body?.append(contentsOf: other.body ?? [])
+    self.headers.append(contentsOf: other.headers)
+    self.method = self.method ?? other.method
+    self.path.append(contentsOf: other.path)
+    self.query.append(contentsOf: other.query)
+  }
+}
+
 public struct Body<BodyParser>: Parser
-where
+  where
   BodyParser: Parser,
   BodyParser.Input == ArraySlice<UInt8>
 {
@@ -47,8 +67,16 @@ where
   }
 }
 
+extension Body: Printer where BodyParser: Printer {
+  public func print(_ output: BodyParser.Output) -> URLRequestData? {
+    guard let body = self.bodyParser.print(output)
+    else { return nil }
+    return .init(body: body)
+  }
+}
+
 public struct Header<ValueParser>: Parser
-where
+  where
   ValueParser: Parser,
   ValueParser.Input == Substring
 {
@@ -82,6 +110,14 @@ where
   }
 }
 
+extension Header: Printer where ValueParser: Printer {
+  public func print(_ output: ValueParser.Output) -> URLRequestData? {
+    guard let value = self.valueParser.print(output)
+    else { return nil }
+    return .init(headers: [self.name: value])
+  }
+}
+
 public struct JSON<Value: Decodable>: Parser {
   public let decoder: JSONDecoder
 
@@ -100,6 +136,15 @@ public struct JSON<Value: Decodable>: Parser {
     else { return nil }
     input = []
     return output
+  }
+}
+
+extension JSON: Printer where Value: Encodable {
+  public func print(_ output: Value) -> ArraySlice<UInt8>? {
+    let encoder = JSONEncoder()
+    guard let json = try? encoder.encode(output)
+    else { return nil }
+    return ArraySlice(json)
   }
 }
 
@@ -125,8 +170,14 @@ public struct Method: Parser {
   }
 }
 
+extension Method: Printer {
+  public func print(_ output: Void) -> URLRequestData? {
+    .init(method: self.name)
+  }
+}
+
 public struct Path<ComponentParser>: Parser
-where
+  where
   ComponentParser: Parser,
   ComponentParser.Input == Substring
 {
@@ -150,6 +201,12 @@ where
   }
 }
 
+extension Path: Printer where ComponentParser: Printer {
+  public func print(_ output: ComponentParser.Output) -> URLRequestData? {
+    .init(path: self.componentParser.print(output).map { [$0] } ?? [])
+  }
+}
+
 public struct PathEnd: Parser {
   @inlinable
   public init() {}
@@ -162,8 +219,14 @@ public struct PathEnd: Parser {
   }
 }
 
+extension PathEnd: Printer {
+  public func print(_ output: Void) -> URLRequestData? {
+    .init()
+  }
+}
+
 public struct Query<ValueParser>: Parser
-where
+  where
   ValueParser: Parser,
   ValueParser.Input == Substring
 {
@@ -211,34 +274,44 @@ where
   }
 }
 
+extension Query: Printer where ValueParser: Printer {
+  public func print(_ output: ValueParser.Output) -> URLRequestData? {
+    guard
+      let value = self.valueParser.print(output)
+      ?? self.defaultValue.flatMap(self.valueParser.print) // TODO: Should we print defaultValue?
+    else { return nil }
+    return .init(query: [self.name: [value]])
+  }
+}
+
 public struct Routing<RouteParser, Route>: Parser
-where
+  where
   RouteParser: Parser,
   RouteParser.Input == URLRequestData
 {
-  public let parser: Zip2_OV<Parsers.Map<RouteParser, Route>, PathEnd>
+  public let parser: Zip2_OV<Parsers.Pipe<RouteParser, CasePath<Route, RouteParser.Output>>, PathEnd>
 
   @inlinable
   public init(
-    _ route: @escaping (RouteParser.Output) -> Route,
+    _ route: CasePath<Route, RouteParser.Output>,
     @ParserBuilder to parser: () -> RouteParser
   ) {
-    self.parser = Zip2_OV(parser().map(route), PathEnd())
+    self.parser = Zip2_OV(parser().pipe(route), PathEnd())
   }
 
   @inlinable
   public init(
-    _ route: Route,
+    _ route: CasePath<Route, Void>,
     @ParserBuilder to parser: () -> RouteParser
   ) where RouteParser.Output == Void {
-    self.init({ route }, to: parser)
+    self.parser = Zip2_OV(parser().pipe(route), PathEnd())
   }
 
   @inlinable
   public init(
-    _ route: Route
+    _ route: CasePath<Route, Void>
   ) where RouteParser == Always<URLRequestData, Void> {
-    self.init({ route }, to: { Always<URLRequestData, Void>(()) })
+    self.init(route, to: { Always<URLRequestData, Void>(()) })
   }
 
   @inlinable
@@ -246,3 +319,13 @@ where
     self.parser.parse(&input)
   }
 }
+
+// extension Routing: Printer where RouteParser: Printer {
+//  public func print(_ output: ValueParser.Output) -> URLRequestData? {
+//    guard
+//      let value = self.valueParser.print(output)
+//      ?? self.defaultValue.flatMap(self.valueParser.print) // TODO: Should we print defaultValue?
+//    else { return nil }
+//    return .init(query: [self.name: [value]])
+//  }
+// }

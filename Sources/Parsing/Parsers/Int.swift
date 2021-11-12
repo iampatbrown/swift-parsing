@@ -68,7 +68,7 @@ extension Parsers {
   /// You will not typically need to interact with this type directly. Instead you will usually use
   /// `Int.parser()`, which constructs this type.
   public struct IntParser<Input, Output>: Parser
-  where
+    where
     Input: Collection,
     Input.SubSequence == Input,
     Input.Element == UTF8.CodeUnit,
@@ -132,8 +132,8 @@ extension Parsers {
         guard !overflow else { return nil }
         (output, overflow) =
           isPositive
-          ? output.addingReportingOverflow(n)
-          : output.subtractingReportingOverflow(n)
+            ? output.addingReportingOverflow(n)
+            : output.subtractingReportingOverflow(n)
         guard !overflow else { return nil }
         length += 1
       }
@@ -161,5 +161,14 @@ extension Parsers {
     public func parse(_ input: inout Substring) -> Output? {
       self.parser.parse(&input.utf8)
     }
+  }
+}
+
+extension Parsers.IntParser: Printer
+  where
+  Input: RangeReplaceableCollection
+{
+  public func print(_ output: Output) -> Input? {
+    Input(String(output, radix: Int(self.radix)).utf8) // TODO: pretty sure it's okay to use Int here...
   }
 }

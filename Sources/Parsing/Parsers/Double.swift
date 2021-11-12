@@ -311,3 +311,13 @@ extension Collection where SubSequence == Self, Element == UTF8.CodeUnit {
     return original[..<self.startIndex]
   }
 }
+
+
+extension Parsers.DoubleParser: Printer
+where
+  Input: RangeReplaceableCollection
+{
+  public func print(_ output: Output) -> Input? {
+    Input(String(output).utf8)
+  }
+}

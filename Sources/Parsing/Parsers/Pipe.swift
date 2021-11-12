@@ -24,7 +24,7 @@ extension Parsers {
   /// You will not typically need to interact with this type directly. Instead you will usually use
   /// the ``Parser/pipe(_:)`` operation, which constructs this type.
   public struct Pipe<Upstream, Downstream>: Parser
-  where
+    where
     Upstream: Parser,
     Downstream: Parser,
     Upstream.Output == Downstream.Input
@@ -53,5 +53,18 @@ extension Parsers {
 
       return output
     }
+  }
+}
+
+// TODO: Is this the same as MapViaParser?
+
+extension Parsers.Pipe: Printer
+  where
+  Upstream: Printer,
+  Downstream: Printer
+{
+  @inlinable
+  public func print(_ output: Downstream.Output) -> Upstream.Input? {
+    self.downstream.print(output).flatMap(self.upstream.print)
   }
 }
