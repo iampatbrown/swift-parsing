@@ -27,7 +27,7 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
         case post(Comment)
         case show(count: Int?)
 
-        struct Comment: Decodable, Equatable {
+        struct Comment: Codable, Equatable {
           let commenter: String
           let message: String
         }
