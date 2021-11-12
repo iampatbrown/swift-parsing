@@ -320,12 +320,8 @@ public struct Routing<RouteParser, Route>: Parser
   }
 }
 
-// extension Routing: Printer where RouteParser: Printer {
-//  public func print(_ output: ValueParser.Output) -> URLRequestData? {
-//    guard
-//      let value = self.valueParser.print(output)
-//      ?? self.defaultValue.flatMap(self.valueParser.print) // TODO: Should we print defaultValue?
-//    else { return nil }
-//    return .init(query: [self.name: [value]])
+// extension Routing: Printer  {
+//  public func print(_ output: Route) -> URLRequestData? {
+//
 //  }
 // }
