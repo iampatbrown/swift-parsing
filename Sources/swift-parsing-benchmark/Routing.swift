@@ -125,13 +125,12 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
 
   var input: [URLRequestData]!
   var expectedInput = requests
-  expectedInput[4] = URLRequestData(request: URLRequest(url: URL(string: "/episodes/1/comments?count=10")!))! // defaultValue
+  let routeWithDefaultValue = URLRequestData(request: URLRequest(url: URL(string: "/episodes/1/comments?count=10")!))!
+  expectedInput[4] = routeWithDefaultValue
 
   suite.benchmark(
     name: "Printer",
-    run: {
-      input = expectedOutput.map { router.print($0)! }
-    },
+    run: { input = expectedOutput.map { router.print($0)! } },
     tearDown: {
       precondition(input == expectedInput)
     }

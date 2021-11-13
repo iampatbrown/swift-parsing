@@ -1,7 +1,8 @@
 import Foundation
 
 public protocol ExpressibleByUTF8CodeUnits {
-  init<C>(codeUnits: C) where C: Collection, C.Element == UTF8.CodeUnit // Was originally S: Sequence changed for String
+  // Originally used Sequence but changed to Collection so it works with String(decoding:as:)
+  init<C>(codeUnits: C) where C: Collection, C.Element == UTF8.CodeUnit
 }
 
 extension Array: ExpressibleByUTF8CodeUnits where Element == UTF8.CodeUnit {

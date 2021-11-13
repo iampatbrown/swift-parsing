@@ -165,10 +165,7 @@ extension Parsers {
   }
 }
 
-extension Parsers.IntParser: Printer
-  where
-  Input: ExpressibleByUTF8CodeUnits
-{
+extension Parsers.IntParser: Printer where Input: ExpressibleByUTF8CodeUnits {
   @inlinable
   public func print(_ output: Output) -> Input? {
     Input(codeUnits: String(output, radix: Int(self.radix)).utf8)
@@ -181,5 +178,3 @@ extension Parsers.SubstringIntParser: Printer {
     Substring(String(output, radix: Int(self.parser.radix)))
   }
 }
-
-
