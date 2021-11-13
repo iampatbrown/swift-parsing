@@ -30,6 +30,7 @@ extension Lazy: Printer
   where
   LazyParser: Printer
 {
+  @inlinable
   public func print(_ output: LazyParser.Output) -> LazyParser.Input? {
     guard let parser = self.lazyParser else {
       let parser = self.createParser()

@@ -64,6 +64,7 @@ extension Parsers.Pipe: Printer
   Downstream: Printer
 {
   @inlinable
+  @inline(__always)
   public func print(_ output: Downstream.Output) -> Upstream.Input? {
     self.downstream.print(output).flatMap(self.upstream.print)
   }

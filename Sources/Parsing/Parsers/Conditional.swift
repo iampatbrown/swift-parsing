@@ -57,6 +57,7 @@ where
   First: Printer,
   Second: Printer
 {
+  @inlinable
   public func print(_ output: First.Output) -> First.Input? {
     switch self {
     case let .first(first):

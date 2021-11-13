@@ -29,6 +29,20 @@ struct Permutation {
   var captureIndices: [Int] {
     (0..<arity).filter { !isCaptureless(at: $0) }
   }
+
+  func output(of index: Int) -> String {
+    switch captureIndices.count {
+    case 0: return "()"
+    case 1: return isCaptureless(at: index) ? "()" : "output"
+    default:
+      // could probably figure this out with some sort of bit mask
+      if let outputIndex = captureIndices.firstIndex(of: index) {
+        return "output.\(outputIndex)"
+      } else {
+        return "()"
+      }
+    }
+  }
 }
 
 struct Permutations: Sequence {
@@ -127,6 +141,20 @@ struct VariadicsGenerator: ParsableCommand {
       outputForEach(permutation.captureIndices, separator: ", ") { "o\($0)" }
       output(")\n  }\n}\n\n")
 
+      // Emit printer.
+      output("extension \(typeName): Printer\nwhere\n  ")
+      outputForEach(0..<arity, separator: ",\n  ") { "P\($0): Printer" }
+      output(",\n  Input: Appendable")
+      output("\n{\n  @inlinable public func print(_ output: Output) -> Input? {\n    ")
+      output("var input = Input()\n    guard\n      ")
+      outputForEach(0..<arity, separator: ",\n      ") {
+        "let i\($0) = p\($0).print(\(permutation.output(of: $0)))"
+      }
+      output("\n    else { return nil }\n    ")
+      outputForEach(0..<arity, separator: "\n    ") { "input.append(contentsOf: i\($0))" }
+      output("\n    return input\n  }\n}\n\n")
+
+
       // Emit builders.
       output("extension ParserBuilder {\n")
       output("  @inlinable public static func buildBlock<")
@@ -167,6 +195,14 @@ struct VariadicsGenerator: ParsableCommand {
       "if let output = self.p\($0).parse(&input) { return output }"
     }
     output("\n    return nil\n  }\n}\n\n")
+
+    // Emit printer.
+    output("extension \(typeName): Printer\nwhere\n  ")
+    outputForEach(0..<arity, separator: ",\n  ") { "P\($0): Printer" }
+    output("\n{\n  @inlinable public func print(_ output: Output) -> Input? {\n    ")
+    outputForEach(0..<arity, separator: "\n    ") { "if let input = p\($0).print(output) { return input }" }
+    output("\n    return nil\n  }\n}\n\n")
+
 
     // Emit builders.
     output("extension OneOfBuilder {\n")

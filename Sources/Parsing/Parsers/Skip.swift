@@ -128,6 +128,7 @@ where
   A.Input: Appendable,
   B: Printer
 {
+  @inlinable
   public func print(_ output: B.Output) -> A.Input? {
     guard
       var input1 = self.a.print(()),
@@ -146,6 +147,7 @@ where
   B: Printer,
   B.Output == Void
 {
+  @inlinable
   public func print(_ output: A.Output) -> A.Input? {
     guard
       var input1 = self.a.print(output),

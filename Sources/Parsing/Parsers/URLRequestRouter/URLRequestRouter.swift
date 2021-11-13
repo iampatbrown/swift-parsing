@@ -1,7 +1,7 @@
 import CasePaths
 import Foundation
 
-public struct URLRequestData {
+public struct URLRequestData: Equatable {
   public var body: ArraySlice<UInt8>?
   public var headers: [String: Substring]
   public var method: String?
@@ -25,6 +25,7 @@ public struct URLRequestData {
 
 extension URLRequestData: Appendable {
   // self.init() could probably be used
+  @inlinable
   public init() {
     self.method = nil
     self.path = []
@@ -33,8 +34,16 @@ extension URLRequestData: Appendable {
     self.body = nil
   }
 
+  @inlinable
   public mutating func append(contentsOf other: URLRequestData) {
-    self.body?.append(contentsOf: other.body ?? [])
+//    self.body?.append(contentsOf: other.body ?? [])
+    if let otherBody = other.body { // TODO: maybe?
+      if self.body != nil {
+        self.body!.append(contentsOf: otherBody)
+      } else {
+        self.body = otherBody
+      }
+    }
     self.headers.append(contentsOf: other.headers)
     self.method = self.method ?? other.method
     self.path.append(contentsOf: other.path)
@@ -68,6 +77,8 @@ public struct Body<BodyParser>: Parser
 }
 
 extension Body: Printer where BodyParser: Printer {
+  @inlinable
+  @inline(__always)
   public func print(_ output: BodyParser.Output) -> URLRequestData? {
     guard let body = self.bodyParser.print(output)
     else { return nil }
@@ -111,6 +122,7 @@ public struct Header<ValueParser>: Parser
 }
 
 extension Header: Printer where ValueParser: Printer {
+  @inlinable
   public func print(_ output: ValueParser.Output) -> URLRequestData? {
     guard let value = self.valueParser.print(output)
     else { return nil }
@@ -120,13 +132,16 @@ extension Header: Printer where ValueParser: Printer {
 
 public struct JSON<Value: Decodable>: Parser {
   public let decoder: JSONDecoder
+  public let encoder: JSONEncoder
 
   @inlinable
   public init(
     _ type: Value.Type,
-    decoder: JSONDecoder = .init()
+    decoder: JSONDecoder = .init(),
+    encoder: JSONEncoder = .init()
   ) {
     self.decoder = decoder
+    self.encoder = encoder
   }
 
   @inlinable
@@ -140,8 +155,9 @@ public struct JSON<Value: Decodable>: Parser {
 }
 
 extension JSON: Printer where Value: Encodable {
+  @inlinable
+  @inline(__always)
   public func print(_ output: Value) -> ArraySlice<UInt8>? {
-    let encoder = JSONEncoder()
     guard let json = try? encoder.encode(output)
     else { return nil }
     return ArraySlice(json)
@@ -171,6 +187,7 @@ public struct Method: Parser {
 }
 
 extension Method: Printer {
+  @inlinable
   public func print(_ output: Void) -> URLRequestData? {
     .init(method: self.name)
   }
@@ -202,6 +219,7 @@ public struct Path<ComponentParser>: Parser
 }
 
 extension Path: Printer where ComponentParser: Printer {
+  @inlinable
   public func print(_ output: ComponentParser.Output) -> URLRequestData? {
     .init(path: self.componentParser.print(output).map { [$0] } ?? [])
   }
@@ -220,6 +238,7 @@ public struct PathEnd: Parser {
 }
 
 extension PathEnd: Printer {
+  @inlinable
   public func print(_ output: Void) -> URLRequestData? {
     .init()
   }
@@ -275,11 +294,9 @@ public struct Query<ValueParser>: Parser
 }
 
 extension Query: Printer where ValueParser: Printer {
+  @inlinable
   public func print(_ output: ValueParser.Output) -> URLRequestData? {
-    guard
-      let value = self.valueParser.print(output)
-      ?? self.defaultValue.flatMap(self.valueParser.print) // TODO: Should we print defaultValue?
-    else { return nil }
+    guard let value = self.valueParser.print(output) else { return nil }
     return .init(query: [self.name: [value]])
   }
 }
@@ -320,13 +337,10 @@ public struct Routing<RouteParser, Route>: Parser
   }
 }
 
-// extension Routing: Printer  {
-//  public func print(_ output: Route) -> URLRequestData? {
-//
-//  }
-// }
-
-
-// TODO: Update Variadic Printers
-
-
+extension Routing: Printer where RouteParser: Printer {
+  @inlinable
+  @inline(__always)
+  public func print(_ output: Route) -> URLRequestData? {
+    self.parser.print(output)
+  }
+}

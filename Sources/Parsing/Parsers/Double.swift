@@ -317,6 +317,7 @@ extension Parsers.DoubleParser: Printer
 where
   Input: RangeReplaceableCollection
 {
+  @inlinable
   public func print(_ output: Output) -> Input? {
     Input(String(output).utf8)
   }

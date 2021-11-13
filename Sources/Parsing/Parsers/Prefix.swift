@@ -275,6 +275,7 @@ extension Parsers {
 }
 
 extension Prefix: Printer {
+  @inlinable
   public func print(_ output: Input) -> Input? {
     var output = output
     return self.skip(End()).parse(&output)

@@ -29,6 +29,7 @@ extension Parsers {
 
 
 extension Rest: Printer {
+  @inlinable
   public func print(_ output: Input) -> Input? {
     output
   }

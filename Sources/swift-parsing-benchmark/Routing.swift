@@ -87,8 +87,8 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
   var postRequest = URLRequest(url: URL(string: "/episodes/1/comments")!)
   postRequest.httpMethod = "POST"
   postRequest.httpBody = Data("""
-  {"commenter": "Blob", "message": "Hi!"}
-  """.utf8)
+  {"commenter":"Blob","message":"Hi!"}
+  """.utf8) // TODO: I removed the whitespace
   let requests = [
     URLRequest(url: URL(string: "/")!),
     URLRequest(url: URL(string: "/contact-us")!),
@@ -120,6 +120,20 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
     },
     tearDown: {
       precondition(output == expectedOutput)
+    }
+  )
+
+  var input: [URLRequestData]!
+  var expectedInput = requests
+  expectedInput[4] = URLRequestData(request: URLRequest(url: URL(string: "/episodes/1/comments?count=10")!))! // defaultValue
+
+  suite.benchmark(
+    name: "Printer",
+    run: {
+      input = expectedOutput.map { router.print($0)! }
+    },
+    tearDown: {
+      precondition(input == expectedInput)
     }
   )
 }

@@ -85,6 +85,8 @@ extension OneOfMany: Printer
 where
   Upstream: Printer
 {
+  @inlinable
+  @inline(__always)
   public func print(_ output: Upstream.Output) -> Upstream.Input? {
     for parser in self.parsers {
       if let input = parser.print(output) {
@@ -100,6 +102,7 @@ where
   A: Printer,
   B: Printer
 {
+  @inlinable
   public func print(_ output: A.Output) -> A.Input? {
     self.a.print(output) ?? self.b.print(output)
   }

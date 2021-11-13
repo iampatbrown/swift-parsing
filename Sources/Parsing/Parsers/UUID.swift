@@ -166,6 +166,7 @@ extension Parsers.UUIDParser: Printer where Input: RangeReplaceableCollection {
 }
 
 extension Parsers.SubstringUUIDParser: Printer {
+  @inlinable
   public func print(_ output: UUID) -> Substring? {
     output.uuidString[...]
   }

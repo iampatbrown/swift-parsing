@@ -29,6 +29,7 @@ extension Parsers {
 
 
 extension End: Printer where Input: Appendable {
+  @inlinable
   public func print(_ output: ()) -> Input? {
     Input()
   }

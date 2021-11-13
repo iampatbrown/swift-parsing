@@ -51,6 +51,7 @@ where
   Upstream: Printer,
   Upstream.Input: Appendable
 {
+  @inlinable
   public func print(_ output: Upstream.Output?) -> Upstream.Input? {
     guard let output = output
     else { return .init() }

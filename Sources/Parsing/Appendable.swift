@@ -24,6 +24,7 @@ extension Substring: Appendable {}
 extension Substring.UnicodeScalarView: Appendable {}
 
 extension Dictionary: Appendable where Value: Appendable {
+  @inlinable
   public mutating func append(contentsOf other: Self) {
     self.merge(other, uniquingKeysWith: +)
   }

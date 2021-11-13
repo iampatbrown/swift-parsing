@@ -39,6 +39,7 @@ extension First: Printer
 where
   Input: RangeReplaceableCollection
 {
+  @inlinable
   public func print(_ output: Input.Element) -> Input? {
     var empty = Input()
     empty.append(output)

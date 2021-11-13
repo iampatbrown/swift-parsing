@@ -40,6 +40,7 @@ extension ElementsEqual where Input.Element: Equatable {
 }
 
 extension ElementsEqual: Printer where Input: RangeReplaceableCollection {
+  @inlinable
   public func print(_ output: Void) -> Input? {
     Input(self.elements)
   }

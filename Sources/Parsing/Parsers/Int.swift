@@ -1,3 +1,4 @@
+import Foundation
 extension FixedWidthInteger {
   /// A parser that consumes an integer (with an optional leading `+` or `-` sign) from the
   /// beginning of a collection of UTF-8 code units.
@@ -166,9 +167,19 @@ extension Parsers {
 
 extension Parsers.IntParser: Printer
   where
-  Input: RangeReplaceableCollection
+  Input: ExpressibleByUTF8CodeUnits
 {
+  @inlinable
   public func print(_ output: Output) -> Input? {
-    Input(String(output, radix: Int(self.radix)).utf8) // TODO: pretty sure it's okay to use Int here...
+    Input(codeUnits: String(output, radix: Int(self.radix)).utf8)
   }
 }
+
+extension Parsers.SubstringIntParser: Printer {
+  @inlinable
+  public func print(_ output: Output) -> Input? {
+    Substring(String(output, radix: Int(self.parser.radix)))
+  }
+}
+
+

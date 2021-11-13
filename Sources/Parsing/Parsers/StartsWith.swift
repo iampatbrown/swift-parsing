@@ -83,6 +83,7 @@ extension StartsWith: Printer
 where
   Input: RangeReplaceableCollection
 {
+  @inlinable
   public func print(_ output: Void) -> Input? {
     Input(self.possiblePrefix)
   }

@@ -31,6 +31,7 @@ extension Parsers {
 
 // TODO: Is this right? or should it be parsed?
 extension Whitespace: Printer {
+  @inlinable
   public func print(_ output: Input) -> Input? {
     return output
   }

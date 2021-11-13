@@ -92,6 +92,7 @@ extension Parsers.BoolParser: Printer
 where
   Input: RangeReplaceableCollection
 {
+  @inlinable
   public func print(_ output: Bool) -> Input? {
     switch output {
     case true:
@@ -103,6 +104,7 @@ where
 }
 
 extension Parsers.SubstringBoolParser: Printer {
+  @inlinable
   public func print(_ output: Bool) -> Substring? {
     switch output {
     case true:

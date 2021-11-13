@@ -242,6 +242,7 @@ where
   Result: Collection,
   Result.Element == Upstream.Output
 {
+  @inlinable
   public func print(_ output: Result) -> Upstream.Input? {
     let range = self.minimum...self.maximum
     var input = Upstream.Input()

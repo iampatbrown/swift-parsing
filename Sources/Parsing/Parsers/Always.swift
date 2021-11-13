@@ -42,6 +42,7 @@ extension Always: Printer
 where
   Input: Appendable
 {
+  @inlinable
   public func print(_ output: Output) -> Input? {
     .init() // Note to self: Always does not consume any of its input; it prints an empty input.
   }

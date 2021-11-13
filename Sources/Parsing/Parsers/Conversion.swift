@@ -2,9 +2,12 @@ import Foundation
 
 public struct Conversion<Input, Output>: ParserPrinter {
   // TODO: Should these be internal and @usableFromInline?
-  private let apply: (Input) -> Output
-  private let unapply: (Output) -> Input
+  @usableFromInline
+  let apply: (Input) -> Output
+  @usableFromInline
+  let unapply: (Output) -> Input
 
+  @inlinable
   public init(
     apply: @escaping (Input) -> Output,
     unapply: @escaping (Output) -> Input
@@ -13,18 +16,22 @@ public struct Conversion<Input, Output>: ParserPrinter {
     self.unapply = unapply
   }
 
+  @inlinable
   public func apply(_ input: Input) -> Output {
     self.apply(input)
   }
 
+  @inlinable
   public func unapply(_ output: Output) -> Input {
     self.unapply(output)
   }
 
+  @inlinable
   public func parse(_ input: inout Input) -> Output? {
     self.apply(input)
   }
 
+  @inlinable
   public func print(_ output: Output) -> Input? {
     self.unapply(output)
   }
