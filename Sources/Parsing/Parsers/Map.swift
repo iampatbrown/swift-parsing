@@ -91,7 +91,7 @@ where
   }
 }
 
-extension Printer {
+extension Parser {
   @inlinable
   public func map<P>(_ transform: P) -> Parsers.MapViaParser<Self, P>
   where
