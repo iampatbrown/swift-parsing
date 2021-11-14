@@ -1,4 +1,5 @@
 import Benchmark
+import CoreFoundation
 import Parsing
 
 private struct Color: Equatable {
@@ -21,6 +22,20 @@ private let hexColor = Parse {
 }
 .map(Color.init(red:green:blue:))
 
+extension Color {
+  fileprivate static let fromString = PartialConversion<String, Self>.init(
+    apply: hexColor.parse,
+    unapply: { "#\(byteString($0.red))\(byteString($0.green))\(byteString($0.blue))" }
+  )
+}
+
+private func byteString(_ byte: UInt8) -> String {
+  //  String(format: "%02X", byte) is pretty slow
+  byte < 16 ? "0" + String(byte, radix: 16, uppercase: true) : String(byte, radix: 16, uppercase: true)
+}
+
+
+
 let colorSuite = BenchmarkSuite(name: "Color") { suite in
   let input = "#FF0000"
   let expected = Color(red: 0xFF, green: 0x00, blue: 0x00)
@@ -30,5 +45,18 @@ let colorSuite = BenchmarkSuite(name: "Color") { suite in
     name: "Parser",
     run: { output = hexColor.parse(input) },
     tearDown: { precondition(output == expected) }
+  )
+
+  suite.benchmark(
+    name: "Conversion.apply",
+    run: { output = Color.fromString.apply(input) },
+    tearDown: { precondition(output == expected) }
+  )
+
+  var hexString: String!
+  suite.benchmark(
+    name: "Conversion.unapply",
+    run: { hexString = Color.fromString.unapply(expected) },
+    tearDown: { precondition(hexString == input) }
   )
 }
