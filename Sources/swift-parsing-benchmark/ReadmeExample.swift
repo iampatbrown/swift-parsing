@@ -51,6 +51,49 @@ let readmeExampleSuite = BenchmarkSuite(name: "README Example") { suite in
   do {
     let user = Parse {
       Int.parser()
+      ","
+      Prefix { $0 != "," }
+      ","
+      Bool.parser()
+    }
+    .map { User(id: $0, name: String($1), isAdmin: $2) }
+
+    let userConversion = PartialConversion(apply: user.parse, unapply: { "\($0.id),\($0.name),\($0.isAdmin)"[...] })
+
+    let users = Many {
+      userConversion
+    } separatedBy: {
+      "\n"
+    }
+
+    suite.benchmark(
+      name: "ParserPrinter.parse: Substring",
+      run: {
+        var input = input[...]
+        output = users.parse(&input)!
+      },
+      tearDown: {
+//        precondition(output == expectedOutput) // Not working atm
+      }
+    )
+
+    var printed: Substring!
+    suite.benchmark(
+      name: "ParserPrinter.parse: Substring",
+      run: {
+        printed = users.print(expectedOutput)!
+      },
+      tearDown: {
+        precondition(String(printed) == input)
+      }
+    )
+  }
+
+
+
+  do {
+    let user = Parse {
+      Int.parser()
       ",".utf8
       Prefix { $0 != .init(ascii: ",") }
       ",".utf8
