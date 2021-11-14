@@ -8,6 +8,7 @@ public struct URLRequestData: Equatable {
   public var path: ArraySlice<Substring>
   public var query: [String: ArraySlice<Substring?>]
 
+  @inlinable
   public init(
     method: String? = nil,
     path: ArraySlice<Substring> = [],
@@ -306,14 +307,14 @@ public struct Routing<RouteParser, Route>: Parser
   RouteParser: Parser,
   RouteParser.Input == URLRequestData
 {
-  public let parser: Zip2_OV<Parsers.Pipe<RouteParser, CasePath<Route, RouteParser.Output>>, PathEnd>
+  public let parser: Zip2_OV<Parsers.MapViaParser<RouteParser, CasePath<Route, RouteParser.Output>>, PathEnd>
 
   @inlinable
   public init(
     _ route: CasePath<Route, RouteParser.Output>,
     @ParserBuilder to parser: () -> RouteParser
   ) {
-    self.parser = Zip2_OV(parser().pipe(route), PathEnd())
+    self.parser = Zip2_OV(parser().map(route), PathEnd())
   }
 
   @inlinable
@@ -321,7 +322,7 @@ public struct Routing<RouteParser, Route>: Parser
     _ route: CasePath<Route, Void>,
     @ParserBuilder to parser: () -> RouteParser
   ) where RouteParser.Output == Void {
-    self.parser = Zip2_OV(parser().pipe(route), PathEnd())
+    self.parser = Zip2_OV(parser().map(route), PathEnd())
   }
 
   @inlinable

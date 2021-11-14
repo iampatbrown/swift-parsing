@@ -90,15 +90,15 @@ extension Parsers {
 
 extension Parsers.BoolParser: Printer
 where
-  Input: RangeReplaceableCollection
+  Input: ExpressibleByUTF8CodeUnits
 {
   @inlinable
   public func print(_ output: Bool) -> Input? {
     switch output {
     case true:
-      return Input([116, 114, 117, 101])
+      return Input(codeUnits: [116, 114, 117, 101])
     case false:
-      return Input([102, 97, 108, 115, 101])
+      return Input(codeUnits: [102, 97, 108, 115, 101])
     }
   }
 }

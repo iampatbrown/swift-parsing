@@ -1,3 +1,11 @@
+extension Parser where Self: Printer {
+  @inlinable
+  public func eraseToAnyParserPrinter() -> AnyParserPrinter<Input, Output> {
+    .init(self)
+  }
+}
+
+
 public struct AnyParserPrinter<Input, Output>: ParserPrinter {
   @usableFromInline
   let parser: (inout Input) -> Output?

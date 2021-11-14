@@ -29,3 +29,24 @@ extension Dictionary: Appendable where Value: Appendable {
     self.merge(other, uniquingKeysWith: +)
   }
 }
+
+extension String.UTF8View : Appendable {
+  public init() {
+    self = String().utf8
+  }
+
+  public mutating func append(contentsOf other: String.UTF8View) {
+    self = String(self).appending(String(other)).utf8
+  }
+}
+
+extension Substring.UTF8View : Appendable {
+  public init() {
+    self = Substring().utf8
+  }
+
+  public mutating func append(contentsOf other: Substring.UTF8View) {
+    self = Substring(self).appending(Substring(other))[...].utf8
+  }
+}
+

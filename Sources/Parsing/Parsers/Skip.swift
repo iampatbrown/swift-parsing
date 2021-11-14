@@ -52,6 +52,13 @@ public struct Skip<Upstream>: Parser where Upstream: Parser {
   }
 }
 
+extension Skip: Printer where Input: Appendable {
+  @inlinable
+  public func print(_ output: Output) -> Input? {
+    Input()
+  }
+}
+
 extension Parsers {
   /// A parser that runs two parsers, one after the other, taking only the output of the second
   /// parser.

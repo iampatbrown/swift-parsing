@@ -119,6 +119,15 @@ extension Decodable where Self: Encodable {
   }
 }
 
+extension Dictionary {
+  public static var elementFromPair: Conversion<(Key, Value), (key: Key, value: Value)> {
+    .init(
+      apply: { (key: $0.0, value: $0.1) },
+      unapply: { ($0.key, $0.value) }
+    )
+  }
+}
+
 extension RangeReplaceableCollection {
   public static var fromSubsequence: Conversion<SubSequence, Self> {
     Conversion(apply: Self.init(_:), unapply: { $0[...] })
@@ -158,7 +167,7 @@ extension RawRepresentable
 //      }
 //    )
 //  }
-  // Possible alternative 
+  // Possible alternative
   public static var fromRawCase: OneOfMany<
     Parsers.MapViaParser<ElementsEqual<Self.RawValue.SubSequence>, Exactly<Self>>
   > {
@@ -182,4 +191,11 @@ extension SignedNumeric {
 
 extension String {
   public static let fromSubstring: Conversion<Substring, Self> = fromSubsequence
+
+  public static var fromSubstringUTF8View: Conversion<Substring.UTF8View, Self> {
+    .init(
+      apply: { String(decoding: $0, as: UTF8.self) },
+      unapply: { $0[...].utf8 }
+    )
+  }
 }

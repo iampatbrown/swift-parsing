@@ -312,13 +312,47 @@ extension Collection where SubSequence == Self, Element == UTF8.CodeUnit {
   }
 }
 
-
-extension Parsers.DoubleParser: Printer
-where
-  Input: RangeReplaceableCollection
-{
+extension Parsers.DoubleParser: Printer where Input: ExpressibleByUTF8CodeUnits {
   @inlinable
   public func print(_ output: Output) -> Input? {
-    Input(String(output).utf8)
+    Input(codeUnits: String(output).utf8)
   }
 }
+
+extension Parsers.SubstringDoubleParser: Printer {
+  @inlinable
+  public func print(_ output: Output) -> Substring? {
+    output.description[...]
+  }
+}
+
+extension Parsers.FloatParser: Printer where Input: ExpressibleByUTF8CodeUnits {
+  @inlinable
+  public func print(_ output: Output) -> Input? {
+    Input(codeUnits: String(output).utf8)
+  }
+}
+
+extension Parsers.SubstringFloatParser: Printer {
+  @inlinable
+  public func print(_ output: Output) -> Substring? {
+    output.description[...]
+  }
+}
+
+#if !(os(Windows) || os(Android)) && (arch(i386) || arch(x86_64))
+
+extension Parsers.Float80Parser: Printer where Input: ExpressibleByUTF8CodeUnits {
+  @inlinable
+  public func print(_ output: Output) -> Input? {
+    Input(codeUnits: String(output).utf8)
+  }
+}
+
+extension Parsers.SubstringFloat80Parser: Printer {
+  @inlinable
+  public func print(_ output: Output) -> Substring? {
+    output.description[...]
+  }
+}
+#endif

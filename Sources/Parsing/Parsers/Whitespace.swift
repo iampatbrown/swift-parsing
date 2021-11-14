@@ -29,7 +29,7 @@ extension Parsers {
 }
 
 
-// TODO: Is this right? or should it be parsed?
+// TODO: Is this right? or should it be parsed/filtered? eg. what should .print("abc".utf8) return?
 extension Whitespace: Printer {
   @inlinable
   public func print(_ output: Input) -> Input? {
