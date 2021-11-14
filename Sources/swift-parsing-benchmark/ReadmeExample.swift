@@ -4,10 +4,10 @@ import Parsing
 
 let readmeExampleSuite = BenchmarkSuite(name: "README Example") { suite in
   let input = """
-    1,Blob,true
-    2,Blob Jr.,false
-    3,Blob Sr.,true
-    """
+  1,Blob,true
+  2,Blob Jr.,false
+  3,Blob Sr.,true
+  """
   let expectedOutput = [
     User(id: 1, name: "Blob", isAdmin: true),
     User(id: 2, name: "Blob Jr.", isAdmin: false),
@@ -58,10 +58,10 @@ let readmeExampleSuite = BenchmarkSuite(name: "README Example") { suite in
     }
     .map { User(id: $0, name: String($1), isAdmin: $2) }
 
-    let userConversion = PartialConversion(apply: user.parse, unapply: { "\($0.id),\($0.name),\($0.isAdmin)"[...] })
+    let userParserPrinter = user.withPrinter { "\($0.id),\($0.name),\($0.isAdmin)"[...] }
 
     let users = Many {
-      userConversion
+      userParserPrinter
     } separatedBy: {
       "\n"
     }
@@ -73,13 +73,13 @@ let readmeExampleSuite = BenchmarkSuite(name: "README Example") { suite in
         output = users.parse(&input)!
       },
       tearDown: {
-//        precondition(output == expectedOutput) // Not working atm
+        precondition(output == expectedOutput)
       }
     )
 
     var printed: Substring!
     suite.benchmark(
-      name: "ParserPrinter.parse: Substring",
+      name: "ParserPrinter.print: Substring",
       run: {
         printed = users.print(expectedOutput)!
       },
@@ -88,8 +88,6 @@ let readmeExampleSuite = BenchmarkSuite(name: "README Example") { suite in
       }
     )
   }
-
-
 
   do {
     let user = Parse {
@@ -118,22 +116,63 @@ let readmeExampleSuite = BenchmarkSuite(name: "README Example") { suite in
     )
   }
 
+  do {
+    let user = Parse {
+      Int.parser()
+      ",".utf8
+      Prefix { $0 != .init(ascii: ",") }
+      ",".utf8
+      Bool.parser()
+    }
+    .map { User(id: $0, name: String(Substring($1)), isAdmin: $2) }
+
+    let userParserPrinter = user.withPrinter { "\($0.id),\($0.name),\($0.isAdmin)"[...].utf8 }
+
+    let users = Many {
+      userParserPrinter
+    } separatedBy: {
+      "\n".utf8
+    }
+
+    suite.benchmark(
+      name: "ParserPrinter.parse: UTF8",
+      run: {
+        var input = input[...].utf8
+        output = users.parse(&input)!
+      },
+      tearDown: {
+        precondition(output == expectedOutput)
+      }
+    )
+
+    var printed: Substring.UTF8View!
+    suite.benchmark(
+      name: "ParserPrinter.print: UTF8",
+      run: {
+        printed = users.print(expectedOutput)!
+      },
+      tearDown: {
+        precondition(String(printed) == input)
+      }
+    )
+  }
+
   suite.benchmark(
     name: "Adhoc",
     run: {
       output =
         input
-        .split(separator: "\n")
-        .compactMap { row -> User? in
-          let fields = row.split(separator: ",")
-          guard
-            fields.count == 3,
-            let id = Int(fields[0]),
-            let isAdmin = Bool(String(fields[2]))
-          else { return nil }
+          .split(separator: "\n")
+          .compactMap { row -> User? in
+            let fields = row.split(separator: ",")
+            guard
+              fields.count == 3,
+              let id = Int(fields[0]),
+              let isAdmin = Bool(String(fields[2]))
+            else { return nil }
 
-          return User(id: id, name: String(fields[1]), isAdmin: isAdmin)
-        }
+            return User(id: id, name: String(fields[1]), isAdmin: isAdmin)
+          }
     },
     tearDown: {
       precondition(output == expectedOutput)

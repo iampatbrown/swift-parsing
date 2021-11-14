@@ -36,7 +36,7 @@ extension String.UTF8View : Appendable {
   }
 
   public mutating func append(contentsOf other: String.UTF8View) {
-    self = String(self).appending(String(other)).utf8
+    self = (String(self) + String(other)).utf8
   }
 }
 
@@ -46,7 +46,7 @@ extension Substring.UTF8View : Appendable {
   }
 
   public mutating func append(contentsOf other: Substring.UTF8View) {
-    self = Substring(self).appending(Substring(other))[...].utf8
+    self = (Substring(self) + Substring(other)).utf8
   }
 }
 
