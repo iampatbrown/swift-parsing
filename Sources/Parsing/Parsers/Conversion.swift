@@ -89,7 +89,6 @@ extension Array where Element: RangeReplaceableCollection {
     .init(
       apply: { $0.flatMap { $0 } },
       unapply: { $0.map { .init([$0]) } }
-      // TODO: is [[1, 2], [3]] -> [1, 2, 3] -> [[1], [2], [3]] the correct behaviour?
     )
   }
 }

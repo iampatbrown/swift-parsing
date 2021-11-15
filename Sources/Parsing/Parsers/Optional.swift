@@ -12,6 +12,20 @@ public struct Optionally<Upstream>: Parser where Upstream: Parser {
   }
 }
 
+extension Optionally: Printer
+  where
+  Upstream: Printer,
+  Upstream.Input: Appendable
+{
+  @inlinable
+  public func print(_ output: Upstream.Output?) -> Upstream.Input? {
+    guard let output = output
+    else { return .init() }
+
+    return self.upstream.print(output)
+  }
+}
+
 extension Optional {
   /// A parser that parses `nil` when this parser fails.
   ///
