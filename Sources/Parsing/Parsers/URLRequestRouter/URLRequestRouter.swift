@@ -207,6 +207,11 @@ public struct Path<ComponentParser>: Parser
   }
 
   @inlinable
+  public init(literal string: String) where ComponentParser == FromUTF8View<String.UTF8View> {
+    self.componentParser = FromUTF8View { string.utf8 }
+  }
+
+  @inlinable
   public func parse(_ input: inout URLRequestData) -> ComponentParser.Output? {
     guard
       var component = input.path.first,
