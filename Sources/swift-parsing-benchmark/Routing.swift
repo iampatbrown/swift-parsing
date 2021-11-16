@@ -84,57 +84,7 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
     }
   }
 
-  let _router = Router<Route> {
-    Routing(/Route.home) {
-      Method.get
-    }
-
-    Routing(/Route.contactUs) {
-      Method.get
-      Path(FromUTF8View { "contact-us".utf8 })
-    }
-
-    Routing(/Route.episodes) {
-      Path(FromUTF8View { "episodes".utf8 })
-
-      Router<Route.Episodes> {
-        Routing(/Route.Episodes.index) {
-          Method.get
-        }
-
-        Routing(/Route.Episodes.episode) {
-          Path(FromUTF8View { Int.parser() })
-
-          Router<Route.Episode> {
-            Routing(/Route.Episode.show) {
-              Method.get
-            }
-
-            Routing(/Route.Episode.comments) {
-              Path(FromUTF8View { "comments".utf8 })
-
-              Router<Route.Episode.Comments> {
-                Routing(/Route.Episode.Comments.post) {
-                  Method.post
-                  Body {
-                    JSON(Route.Episode.Comments.Comment.self)
-                  }
-                }
-
-                Routing(/Route.Episode.Comments.show) {
-                  Method.get
-                  Query("count", Int.parser(), default: 10)
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-
-  let _routerRouting = _Router<Route> {
+  let _router = _Router<Route> {
     _Routing(/Route.home) {
       Method.get
     }
@@ -182,7 +132,6 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
       }
     }
   }
-
 
   var postRequest = URLRequest(url: URL(string: "/episodes/1/comments")!)
   postRequest.httpMethod = "POST"
@@ -236,21 +185,6 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
     }
   )
 
-  suite.benchmark(
-    name: "_RouterRouting.parse",
-    run: {
-      output = requests.map {
-        var input = $0
-        return _routerRouting.parse(&input)!
-      }
-    },
-    tearDown: {
-      precondition(output == expectedOutput)
-    }
-  )
-
-
-
   var input: [URLRequestData]!
   var expectedInput = requests
   let routeWithDefaultValue = URLRequestData(request: URLRequest(url: URL(string: "/episodes/1/comments?count=10")!))!
@@ -267,14 +201,6 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
   suite.benchmark(
     name: "_Router.print",
     run: { input = expectedOutput.map { _router.print($0)! } },
-    tearDown: {
-      precondition(input == expectedInput)
-    }
-  )
-
-  suite.benchmark(
-    name: "_RouterRouting.print",
-    run: { input = expectedOutput.map { _routerRouting.print($0)! } },
     tearDown: {
       precondition(input == expectedInput)
     }
