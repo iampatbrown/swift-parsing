@@ -29,6 +29,28 @@ public struct _Router<Route>: ParserPrinter {
   }
 }
 
+extension _Router: ExpressibleByArrayLiteral {
+  @inlinable
+  public init(arrayLiteral routers: _Routing<Route>...) {
+    self.init(
+      parse: { input in
+        for router in routers {
+          if let output = router.parse(&input) {
+            return output
+          }
+        }
+        return nil
+      }, print: { output in
+        for router in routers {
+          if let input = router.print(output) {
+            return input
+          }
+        }
+        return nil
+      }
+    )
+  }
+}
 
 public struct _Routing<Route>: ParserPrinter {
   @usableFromInline
