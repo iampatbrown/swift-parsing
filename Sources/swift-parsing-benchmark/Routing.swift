@@ -133,6 +133,57 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
     }
   }
 
+
+  let _routerRouting = _Router<Route> {
+    _Routing(/Route.home) {
+      Method.get
+    }
+
+    _Routing(/Route.contactUs) {
+      Method.get
+      Path(FromUTF8View { "contact-us".utf8 })
+    }
+
+    _Routing(/Route.episodes) {
+      Path(FromUTF8View { "episodes".utf8 })
+
+      _Router<Route.Episodes> {
+        _Routing(/Route.Episodes.index) {
+          Method.get
+        }
+
+        _Routing(/Route.Episodes.episode) {
+          Path(FromUTF8View { Int.parser() })
+
+          _Router<Route.Episode> {
+            _Routing(/Route.Episode.show) {
+              Method.get
+            }
+
+            _Routing(/Route.Episode.comments) {
+              Path(FromUTF8View { "comments".utf8 })
+
+              _Router<Route.Episode.Comments> {
+                _Routing(/Route.Episode.Comments.post) {
+                  Method.post
+                  Body {
+                    JSON(Route.Episode.Comments.Comment.self)
+                  }
+                }
+
+                _Routing(/Route.Episode.Comments.show) {
+                  Method.get
+                  Query("count", Int.parser(), default: 10)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+
   var postRequest = URLRequest(url: URL(string: "/episodes/1/comments")!)
   postRequest.httpMethod = "POST"
   postRequest.httpBody = Data("""
@@ -185,6 +236,20 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
     }
   )
 
+  suite.benchmark(
+    name: "_RouterRouting.parse",
+    run: {
+      output = requests.map {
+        var input = $0
+        return _routerRouting.parse(&input)!
+      }
+    },
+    tearDown: {
+      precondition(output == expectedOutput)
+    }
+  )
+
+
 
   var input: [URLRequestData]!
   var expectedInput = requests
@@ -202,6 +267,14 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
   suite.benchmark(
     name: "_Router.print",
     run: { input = expectedOutput.map { _router.print($0)! } },
+    tearDown: {
+      precondition(input == expectedInput)
+    }
+  )
+
+  suite.benchmark(
+    name: "_RouterRouting.print",
+    run: { input = expectedOutput.map { _routerRouting.print($0)! } },
     tearDown: {
       precondition(input == expectedInput)
     }
