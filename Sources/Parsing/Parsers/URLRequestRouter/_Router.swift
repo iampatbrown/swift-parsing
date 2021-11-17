@@ -1,3 +1,4 @@
+import CasePaths
 public struct _Router<Route>: ParserPrinter {
   @usableFromInline
   let parser: (inout URLRequestData) -> Route?
@@ -52,6 +53,7 @@ extension _Router: ExpressibleByArrayLiteral {
   }
 }
 
+
 public struct _Routing<Route>: ParserPrinter {
   @usableFromInline
   let parser: (inout URLRequestData) -> Route?
@@ -72,20 +74,20 @@ public struct _Routing<Route>: ParserPrinter {
     self.parser = parser.parse
     self.printer = parser.print
   }
-
-  @inlinable
-  public init<RouteParser>(
-    _ route: CasePath<Route, Void>,
-    @ParserBuilder to parser: () -> RouteParser
-  ) where
-    RouteParser: ParserPrinter,
-    RouteParser.Input == URLRequestData,
-    RouteParser.Output == Void
-  {
-    let parser = Zip2_OV(parser().map(route), PathEnd())
-    self.parser = parser.parse
-    self.printer = parser.print
-  }
+//
+//  @inlinable
+//  public init<RouteParser>(
+//    _ route: CasePath<Route, Void>,
+//    @ParserBuilder to parser: () -> RouteParser
+//  ) where
+//    RouteParser: ParserPrinter,
+//    RouteParser.Input == URLRequestData,
+//    RouteParser.Output == Void
+//  {
+//    let parser = Zip2_OV(parser().map(route), PathEnd())
+//    self.parser = parser.parse
+//    self.printer = parser.print
+//  }
 
   @inlinable
   public init(
