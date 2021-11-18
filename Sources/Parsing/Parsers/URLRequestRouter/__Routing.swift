@@ -1,5 +1,6 @@
 import CasePaths
-public struct _Router<Route>: ParserPrinter {
+
+public struct __Routing<Route>: ParserPrinter {
   @usableFromInline
   let parser: (inout URLRequestData) -> Route?
   @usableFromInline
@@ -15,27 +16,9 @@ public struct _Router<Route>: ParserPrinter {
   }
 
   @inlinable
-  public init(@_RouterBuilder _ router: () -> Self) {
+  public init(@__RoutingBuilder _ router: () -> Self) {
     self = router()
   }
-
-  @inlinable
-  public func parse(_ input: inout URLRequestData) -> Route? {
-    self.parser(&input)
-  }
-
-  @inlinable
-  public func print(_ output: Route) -> URLRequestData? {
-    self.printer(output)
-  }
-}
-
-
-public struct _Routing<Route>: ParserPrinter {
-  @usableFromInline
-  let parser: (inout URLRequestData) -> Route?
-  @usableFromInline
-  let printer: (Route) -> URLRequestData?
 
   @inlinable
   public init<Value, RouteParser>(
@@ -51,20 +34,6 @@ public struct _Routing<Route>: ParserPrinter {
     self.parser = parser.parse
     self.printer = parser.print
   }
-//
-//  @inlinable
-//  public init<RouteParser>(
-//    _ route: CasePath<Route, Void>,
-//    @ParserBuilder to parser: () -> RouteParser
-//  ) where
-//    RouteParser: ParserPrinter,
-//    RouteParser.Input == URLRequestData,
-//    RouteParser.Output == Void
-//  {
-//    let parser = Zip2_OV(parser().map(route), PathEnd())
-//    self.parser = parser.parse
-//    self.printer = parser.print
-//  }
 
   @inlinable
   public init(

@@ -133,6 +133,55 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
     }
   }
 
+  let __router = __Routing<Route> {
+    __Routing(/Route.home) {
+      Method.get
+    }
+
+    __Routing(/Route.contactUs) {
+      Method.get
+      Path(FromUTF8View { "contact-us".utf8 })
+    }
+
+    __Routing(/Route.episodes) {
+      Path(FromUTF8View { "episodes".utf8 })
+
+      __Routing<Route.Episodes> {
+        __Routing(/Route.Episodes.index) {
+          Method.get
+        }
+
+        __Routing(/Route.Episodes.episode) {
+          Path(FromUTF8View { Int.parser() })
+
+          __Routing<Route.Episode> {
+            __Routing(/Route.Episode.show) {
+              Method.get
+            }
+
+            __Routing(/Route.Episode.comments) {
+              Path(FromUTF8View { "comments".utf8 })
+
+              __Routing<Route.Episode.Comments> {
+                __Routing(/Route.Episode.Comments.post) {
+                  Method.post
+                  Body {
+                    JSON(Route.Episode.Comments.Comment.self)
+                  }
+                }
+
+                __Routing(/Route.Episode.Comments.show) {
+                  Method.get
+                  Query("count", Int.parser(), default: 10)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   var postRequest = URLRequest(url: URL(string: "/episodes/1/comments")!)
   postRequest.httpMethod = "POST"
   postRequest.httpBody = Data("""
