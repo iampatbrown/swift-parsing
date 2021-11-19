@@ -612,7 +612,7 @@ public final class URLFormDecoder: Decoder {
     ///
     /// - Note: Unkeyed brackets do not specify collection indices, so they cannot accumulate complex
     ///   structures by using multiple keys. See `bracketsWithIndices` as an alternative parsing strategy.
-    static let brackets = custom(parse(isArray: \.isEmpty))
+    public static let brackets = custom(parse(isArray: \.isEmpty))
 
     /// A parsing strategy that uses keys with a bracketed suffix to produce nested structures.
     ///
@@ -630,7 +630,7 @@ public final class URLFormDecoder: Decoder {
     ///
     ///     user[pets][0][id]=1&user[pets][0][name]=Fido
     ///     // Parsed as ["user": ["pets": [["id": "1"], ["name": "Fido"]]]]
-    static let bracketsWithIndices = custom(parse(isArray: { Int($0) != nil }, sort: true))
+    public static let bracketsWithIndices = custom(parse(isArray: { Int($0) != nil }, sort: true))
   }
 }
 
