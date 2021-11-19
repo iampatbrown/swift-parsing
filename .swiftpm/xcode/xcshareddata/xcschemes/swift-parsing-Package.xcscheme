@@ -62,6 +62,20 @@
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "Routing"
+               BuildableName = "Routing"
+               BlueprintName = "Routing"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -77,6 +91,16 @@
                BlueprintIdentifier = "ParsingTests"
                BuildableName = "ParsingTests"
                BlueprintName = "ParsingTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "RoutingTests"
+               BuildableName = "RoutingTests"
+               BlueprintName = "RoutingTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>

@@ -1,19 +1,19 @@
 @resultBuilder
-public enum __RoutingBuilder {
+public enum RoutingBuilder {
   @inlinable
   public static func buildBlock<Route>(
-    _ routing: __Routing<Route>
-  ) -> __Routing<Route> {
-    __Routing(parse: routing.parse, print: routing.print)
+    _ routing: Routing<Route>
+  ) -> Routing<Route> {
+    Routing(parse: routing.parse, print: routing.print)
   }
 }
 
-extension __RoutingBuilder {
+extension RoutingBuilder {
   @inlinable public static func buildBlock<Route>(
-    _ r0: __Routing<Route>,
-    _ r1: __Routing<Route>
-  ) -> __Routing<Route> {
-    __Routing(
+    _ r0: Routing<Route>,
+    _ r1: Routing<Route>
+  ) -> Routing<Route> {
+    Routing(
       parse: { input in
         if let output = r0.parse(&input) { return output }
         if let output = r1.parse(&input) { return output }
@@ -28,13 +28,13 @@ extension __RoutingBuilder {
   }
 }
 
-extension __RoutingBuilder {
+extension RoutingBuilder {
   @inlinable public static func buildBlock<Route>(
-    _ r0: __Routing<Route>,
-    _ r1: __Routing<Route>,
-    _ r2: __Routing<Route>
-  ) -> __Routing<Route> {
-    __Routing(
+    _ r0: Routing<Route>,
+    _ r1: Routing<Route>,
+    _ r2: Routing<Route>
+  ) -> Routing<Route> {
+    Routing(
       parse: { input in
         if let output = r0.parse(&input) { return output }
         if let output = r1.parse(&input) { return output }
@@ -51,14 +51,14 @@ extension __RoutingBuilder {
   }
 }
 
-extension __RoutingBuilder {
+extension RoutingBuilder {
   @inlinable public static func buildBlock<Route>(
-    _ r0: __Routing<Route>,
-    _ r1: __Routing<Route>,
-    _ r2: __Routing<Route>,
-    _ r3: __Routing<Route>
-  ) -> __Routing<Route> {
-    __Routing(
+    _ r0: Routing<Route>,
+    _ r1: Routing<Route>,
+    _ r2: Routing<Route>,
+    _ r3: Routing<Route>
+  ) -> Routing<Route> {
+    Routing(
       parse: { input in
         if let output = r0.parse(&input) { return output }
         if let output = r1.parse(&input) { return output }
@@ -77,15 +77,15 @@ extension __RoutingBuilder {
   }
 }
 
-extension __RoutingBuilder {
+extension RoutingBuilder {
   @inlinable public static func buildBlock<Route>(
-    _ r0: __Routing<Route>,
-    _ r1: __Routing<Route>,
-    _ r2: __Routing<Route>,
-    _ r3: __Routing<Route>,
-    _ r4: __Routing<Route>
-  ) -> __Routing<Route> {
-    __Routing(
+    _ r0: Routing<Route>,
+    _ r1: Routing<Route>,
+    _ r2: Routing<Route>,
+    _ r3: Routing<Route>,
+    _ r4: Routing<Route>
+  ) -> Routing<Route> {
+    Routing(
       parse: { input in
         if let output = r0.parse(&input) { return output }
         if let output = r1.parse(&input) { return output }
@@ -106,16 +106,16 @@ extension __RoutingBuilder {
   }
 }
 
-extension __RoutingBuilder {
+extension RoutingBuilder {
   @inlinable public static func buildBlock<Route>(
-    _ r0: __Routing<Route>,
-    _ r1: __Routing<Route>,
-    _ r2: __Routing<Route>,
-    _ r3: __Routing<Route>,
-    _ r4: __Routing<Route>,
-    _ r5: __Routing<Route>
-  ) -> __Routing<Route> {
-    __Routing(
+    _ r0: Routing<Route>,
+    _ r1: Routing<Route>,
+    _ r2: Routing<Route>,
+    _ r3: Routing<Route>,
+    _ r4: Routing<Route>,
+    _ r5: Routing<Route>
+  ) -> Routing<Route> {
+    Routing(
       parse: { input in
         if let output = r0.parse(&input) { return output }
         if let output = r1.parse(&input) { return output }
@@ -138,17 +138,17 @@ extension __RoutingBuilder {
   }
 }
 
-extension __RoutingBuilder {
+extension RoutingBuilder {
   @inlinable public static func buildBlock<Route>(
-    _ r0: __Routing<Route>,
-    _ r1: __Routing<Route>,
-    _ r2: __Routing<Route>,
-    _ r3: __Routing<Route>,
-    _ r4: __Routing<Route>,
-    _ r5: __Routing<Route>,
-    _ r6: __Routing<Route>
-  ) -> __Routing<Route> {
-    __Routing(
+    _ r0: Routing<Route>,
+    _ r1: Routing<Route>,
+    _ r2: Routing<Route>,
+    _ r3: Routing<Route>,
+    _ r4: Routing<Route>,
+    _ r5: Routing<Route>,
+    _ r6: Routing<Route>
+  ) -> Routing<Route> {
+    Routing(
       parse: { input in
         if let output = r0.parse(&input) { return output }
         if let output = r1.parse(&input) { return output }
@@ -173,18 +173,18 @@ extension __RoutingBuilder {
   }
 }
 
-extension __RoutingBuilder {
+extension RoutingBuilder {
   @inlinable public static func buildBlock<Route>(
-    _ r0: __Routing<Route>,
-    _ r1: __Routing<Route>,
-    _ r2: __Routing<Route>,
-    _ r3: __Routing<Route>,
-    _ r4: __Routing<Route>,
-    _ r5: __Routing<Route>,
-    _ r6: __Routing<Route>,
-    _ r7: __Routing<Route>
-  ) -> __Routing<Route> {
-    __Routing(
+    _ r0: Routing<Route>,
+    _ r1: Routing<Route>,
+    _ r2: Routing<Route>,
+    _ r3: Routing<Route>,
+    _ r4: Routing<Route>,
+    _ r5: Routing<Route>,
+    _ r6: Routing<Route>,
+    _ r7: Routing<Route>
+  ) -> Routing<Route> {
+    Routing(
       parse: { input in
         if let output = r0.parse(&input) { return output }
         if let output = r1.parse(&input) { return output }
@@ -211,19 +211,19 @@ extension __RoutingBuilder {
   }
 }
 
-extension __RoutingBuilder {
+extension RoutingBuilder {
   @inlinable public static func buildBlock<Route>(
-    _ r0: __Routing<Route>,
-    _ r1: __Routing<Route>,
-    _ r2: __Routing<Route>,
-    _ r3: __Routing<Route>,
-    _ r4: __Routing<Route>,
-    _ r5: __Routing<Route>,
-    _ r6: __Routing<Route>,
-    _ r7: __Routing<Route>,
-    _ r8: __Routing<Route>
-  ) -> __Routing<Route> {
-    __Routing(
+    _ r0: Routing<Route>,
+    _ r1: Routing<Route>,
+    _ r2: Routing<Route>,
+    _ r3: Routing<Route>,
+    _ r4: Routing<Route>,
+    _ r5: Routing<Route>,
+    _ r6: Routing<Route>,
+    _ r7: Routing<Route>,
+    _ r8: Routing<Route>
+  ) -> Routing<Route> {
+    Routing(
       parse: { input in
         if let output = r0.parse(&input) { return output }
         if let output = r1.parse(&input) { return output }

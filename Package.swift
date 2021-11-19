@@ -9,6 +9,10 @@ let package = Package(
       name: "Parsing",
       targets: ["Parsing"]
     ),
+    .library(
+      name: "Routing",
+      targets: ["Routing"]
+    ),
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-argument-parser", from: "0.5.0"),
@@ -22,9 +26,21 @@ let package = Package(
         .product(name: "CasePaths", package: "swift-case-paths"),
       ]
     ),
+
     .testTarget(
       name: "ParsingTests",
       dependencies: ["Parsing"]
+    ),
+    .target(
+      name: "Routing",
+      dependencies: [
+        "Parsing",
+        .product(name: "CasePaths", package: "swift-case-paths"),
+      ]
+    ),
+    .testTarget(
+      name: "RoutingTests",
+      dependencies: ["Routing"]
     ),
     .executableTarget(
       name: "swift-parsing-benchmark",

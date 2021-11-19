@@ -27,7 +27,7 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
         case post(Comment)
         case show(count: Int?)
 
-        struct Comment: Codable, Equatable {
+        struct Comment: Decodable, Equatable {
           let commenter: String
           let message: String
         }
@@ -36,141 +36,43 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
   }
 
   let router = OneOf {
-    Routing(/Route.home) {
+    Routing(Route.home) {
       Method.get
     }
 
-    Routing(/Route.contactUs) {
+    Routing(Route.contactUs) {
       Method.get
       Path(FromUTF8View { "contact-us".utf8 })
     }
 
-    Routing(/Route.episodes) {
+    Routing(Route.episodes) {
       Path(FromUTF8View { "episodes".utf8 })
 
       OneOf {
-        Routing(/Route.Episodes.index) {
+        Routing(Route.Episodes.index) {
           Method.get
         }
 
-        Routing(/Route.Episodes.episode) {
+        Routing(Route.Episodes.episode) {
           Path(FromUTF8View { Int.parser() })
 
           OneOf {
-            Routing(/Route.Episode.show) {
+            Routing(Route.Episode.show) {
               Method.get
             }
 
-            Routing(/Route.Episode.comments) {
+            Routing(Route.Episode.comments) {
               Path(FromUTF8View { "comments".utf8 })
 
               OneOf {
-                Routing(/Route.Episode.Comments.post) {
+                Routing(Route.Episode.Comments.post) {
                   Method.post
                   Body {
                     JSON(Route.Episode.Comments.Comment.self)
                   }
                 }
 
-                Routing(/Route.Episode.Comments.show) {
-                  Method.get
-                  Query("count", Int.parser(), default: 10)
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  let _router = _Router<Route> {
-    _Routing(/Route.home) {
-      Method.get
-    }
-
-    _Routing(/Route.contactUs) {
-      Method.get
-      Path(FromUTF8View { "contact-us".utf8 })
-    }
-
-    _Routing(/Route.episodes) {
-      Path(FromUTF8View { "episodes".utf8 })
-
-      _Router<Route.Episodes> {
-        _Routing(/Route.Episodes.index) {
-          Method.get
-        }
-
-        _Routing(/Route.Episodes.episode) {
-          Path(FromUTF8View { Int.parser() })
-
-          _Router<Route.Episode> {
-            _Routing(/Route.Episode.show) {
-              Method.get
-            }
-
-            _Routing(/Route.Episode.comments) {
-              Path(FromUTF8View { "comments".utf8 })
-
-              _Router<Route.Episode.Comments> {
-                _Routing(/Route.Episode.Comments.post) {
-                  Method.post
-                  Body {
-                    JSON(Route.Episode.Comments.Comment.self)
-                  }
-                }
-
-                _Routing(/Route.Episode.Comments.show) {
-                  Method.get
-                  Query("count", Int.parser(), default: 10)
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  let __router = __Routing<Route> {
-    __Routing(/Route.home) {
-      Method.get
-    }
-
-    __Routing(/Route.contactUs) {
-      Method.get
-      Path(FromUTF8View { "contact-us".utf8 })
-    }
-
-    __Routing(/Route.episodes) {
-      Path(FromUTF8View { "episodes".utf8 })
-
-      __Routing<Route.Episodes> {
-        __Routing(/Route.Episodes.index) {
-          Method.get
-        }
-
-        __Routing(/Route.Episodes.episode) {
-          Path(FromUTF8View { Int.parser() })
-
-          __Routing<Route.Episode> {
-            __Routing(/Route.Episode.show) {
-              Method.get
-            }
-
-            __Routing(/Route.Episode.comments) {
-              Path(FromUTF8View { "comments".utf8 })
-
-              __Routing<Route.Episode.Comments> {
-                __Routing(/Route.Episode.Comments.post) {
-                  Method.post
-                  Body {
-                    JSON(Route.Episode.Comments.Comment.self)
-                  }
-                }
-
-                __Routing(/Route.Episode.Comments.show) {
+                Routing(Route.Episode.Comments.show) {
                   Method.get
                   Query("count", Int.parser(), default: 10)
                 }
@@ -185,8 +87,8 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
   var postRequest = URLRequest(url: URL(string: "/episodes/1/comments")!)
   postRequest.httpMethod = "POST"
   postRequest.httpBody = Data("""
-  {"commenter":"Blob","message":"Hi!"}
-  """.utf8) // TODO: I removed the whitespace
+    {"commenter": "Blob", "message": "Hi!"}
+    """.utf8)
   let requests = [
     URLRequest(url: URL(string: "/")!),
     URLRequest(url: URL(string: "/contact-us")!),
@@ -218,40 +120,6 @@ let routingSuite = BenchmarkSuite(name: "Routing") { suite in
     },
     tearDown: {
       precondition(output == expectedOutput)
-    }
-  )
-
-  suite.benchmark(
-    name: "_Router.parse",
-    run: {
-      output = requests.map {
-        var input = $0
-        return _router.parse(&input)!
-      }
-    },
-    tearDown: {
-      precondition(output == expectedOutput)
-    }
-  )
-
-  var input: [URLRequestData]!
-  var expectedInput = requests
-  let routeWithDefaultValue = URLRequestData(request: URLRequest(url: URL(string: "/episodes/1/comments?count=10")!))!
-  expectedInput[4] = routeWithDefaultValue
-
-  suite.benchmark(
-    name: "Printer",
-    run: { input = expectedOutput.map { router.print($0)! } },
-    tearDown: {
-      precondition(input == expectedInput)
-    }
-  )
-
-  suite.benchmark(
-    name: "_Router.print",
-    run: { input = expectedOutput.map { _router.print($0)! } },
-    tearDown: {
-      precondition(input == expectedInput)
     }
   )
 }

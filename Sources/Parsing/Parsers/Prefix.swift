@@ -30,7 +30,7 @@
 /// input // "rem ipsum dolor"
 /// ```
 public struct Prefix<Input>: Parser
-where
+  where
   Input: Collection,
   Input.SubSequence == Input
 {
@@ -271,13 +271,18 @@ where
 }
 
 extension Parsers {
-  public typealias Prefix = Parsing.Prefix  // NB: Convenience type alias for discovery
+  public typealias Prefix = Parsing.Prefix // NB: Convenience type alias for discovery
 }
 
 extension Prefix: Printer {
   @inlinable
   public func print(_ output: Input) -> Input? {
-    var output = output
-    return self.skip(End()).parse(&output)
+    let count = output.count
+    guard
+      count >= self.minLength,
+      count <= self.maxLength ?? .max,
+      self.predicate.map({ output.allSatisfy($0) }) ?? true
+    else { return nil }
+    return output
   }
 }
