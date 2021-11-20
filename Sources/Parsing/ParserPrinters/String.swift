@@ -24,6 +24,13 @@ extension String {
 
   @inlinable
   public static func parser(
+    of inputType: Substring.Type = Substring.self
+  ) -> Parsers.UTF8ViewToSubstring<Parsers.StringParser<Substring.UTF8View>> {
+    .init(.init())
+  }
+
+  @inlinable
+  public static func parser(
     of inputType: Substring.UTF8View.Type = Substring.UTF8View.self
   ) -> Parsers.StringParser<Substring.UTF8View> {
     .init()
@@ -46,30 +53,23 @@ extension String {
 
 extension Parsers {
   public struct StringParser<Input>: Parser
-    where
+  where
     Input: Collection,
+    Input.SubSequence == Input,
     Input.Element == UTF8.CodeUnit
   {
-    @usableFromInline
-    let parser: (inout Input) -> String?
+    @inlinable
+    public init() {}
 
     @inlinable
-    public init() where Input == Substring.UTF8View {
-      self.parser = { String($0) }
-    }
-
-    @inlinable
-    public init() {
-      self.parser = { String(decoding: $0, as: UTF8.self) }
-    }
-
     public func parse(_ input: inout Input) -> String? {
-      self.parser(&input)
+      String(decoding: input, as: UTF8.self)
     }
   }
 }
 
 extension Parsers.StringParser: Printer where Input: AppendableCollection {
+  @inlinable
   public func print(_ output: String) -> Input? {
     var input = Input()
     input.append(contentsOf: output.utf8)

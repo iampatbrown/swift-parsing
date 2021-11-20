@@ -31,7 +31,7 @@ public func foo() {
     ","
     Bool.parser()
   }
-  .pipe { UnsafeBitCast(User.init) }
+  .pipe { UnsafeBitCast(User.init(id:name:isAdmin:)) }
 
   let a = user.parse("1,Blob,true")
   let b = user.print(User(id: 1, name: "Blob", isAdmin: true))
@@ -40,16 +40,20 @@ public func foo() {
 }
 
 public struct UnsafeBitCast<Values, Root>: ParserPrinter {
+  @usableFromInline
   let initializer: (Values) -> Root
 
-  init(_ initializer: @escaping (Values) -> Root) {
+  @inlinable
+  public init(_ initializer: @escaping (Values) -> Root) {
     self.initializer = initializer
   }
 
+  @inlinable
   public func parse(_ input: inout Values) -> Root? {
     self.initializer(input)
   }
 
+  @inlinable
   public func print(_ output: Root) -> Values? {
     Swift.unsafeBitCast(output, to: Values.self)
   }
