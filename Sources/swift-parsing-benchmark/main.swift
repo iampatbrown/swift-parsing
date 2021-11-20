@@ -55,34 +55,34 @@ let appendableSuite = BenchmarkSuite(name: "Appendable") { suite in
       }
     )
   }
-
 }
+
 //
-//benchmark("Substring") {
+// benchmark("Substring") {
 //  var first = string[...]
 //  let second = other[...]
 //  first.append(contentsOf: second)
 //  precondition(first.elementsEqual(combined))
-//}
+// }
 //
-//benchmark("Substring.UnicodeScalarView") {
+// benchmark("Substring.UnicodeScalarView") {
 //  var first = string[...].unicodeScalars
 //  let second = other[...].unicodeScalars
 //  first.append(contentsOf: second)
 //  precondition(first.elementsEqual(combined[...].unicodeScalars))
-//}
+// }
 //
-//benchmark("Substring.UTF8View") {
+// benchmark("Substring.UTF8View") {
 //  var first = string[...].utf8
 //  let second = other[...].utf8
 //  first.append(contentsOf: second)
 //  precondition(first.elementsEqual(combined[...].utf8))
-//}
-
+// }
 
 Benchmark.main(
   [
-    defaultBenchmarkSuite,
+    //        stringSuite,
+//    defaultBenchmarkSuite,
 //    appendableSuite,
 //    arithmeticSuite,
 //    binaryDataSuite,
@@ -96,9 +96,11 @@ Benchmark.main(
 //    prefixUpToSuite,
 //    raceSuite,
 //    readmeExampleSuite,
-    routingSuite,
-//    stringAbstractionsSuite,
+//    routingSuite,
+    stringAbstractionsSuite,
 //    uuidSuite,
 //    xcodeLogsSuite,
   ]
 )
+
+foo()

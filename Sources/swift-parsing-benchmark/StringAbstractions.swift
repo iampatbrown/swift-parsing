@@ -14,10 +14,10 @@ import Parsing
  handle both the "é" and "é" characters.
  */
 let stringAbstractionsSuite = BenchmarkSuite(name: "String Abstractions") { suite in
-  let count = 1_000
+  let count = 1000
   let input = (1...count)
     .reduce(into: "") { accum, int in
-      accum += "\(int)" + (int.isMultiple(of: 2) ? "é" : "é")
+      accum += "\(int % Int(UInt8.max))" + (int.isMultiple(of: 2) ? "é" : "é")
     }
     .dropLast()
 
@@ -44,5 +44,46 @@ let stringAbstractionsSuite = BenchmarkSuite(name: "String Abstractions") { suit
     }
     .parse(&input)
     precondition(output?.count == count)
+  }
+
+  suite.benchmark("StringSubstring") {
+    var input = input[...].utf8
+    let output = Many {
+      UInt8.parser()
+    } separatedBy: {
+      FromSubstring { "é" }
+    }
+    .pipe { String.parser(of: [UInt8].self) }
+    .parse(&input)
+//    precondition(output?.count == count)
+  }
+
+  suite.benchmark("StringUTF8") {
+    var input = input[...].utf8
+    let output = Many {
+      UInt8.parser()
+    } separatedBy: {
+      OneOf {
+        "é".utf8
+        "é".utf8
+      }
+    }
+    .pipe { String.parser(of: [UInt8].self) }
+    .parse(&input)
+//    precondition(output?.count == count)
+  }
+
+  suite.benchmark("StringArraySlice") {
+    var input = ArraySlice(input[...].utf8)
+    let output = Many {
+      Prefix(1).pipe { String.parser() }
+    } separatedBy: {
+      OneOf {
+        Array("é".utf8)
+        Array("é".utf8)
+      }
+    }
+    .parse(&input)
+//    precondition(output?.count == count)
   }
 }
