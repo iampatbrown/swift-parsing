@@ -30,7 +30,7 @@ public struct ReplacingOccurrences<Input>: Parser
     var currentIndex = 0
 
     @inline(__always)
-    func rangeOfNextMatch() -> Range<Int>? {
+    func nextMatch() -> Range<Int>? {
       var searchStart = currentIndex
       while let matchStart = buffer[searchStart...].firstIndex(where: { self.areEquivalent($0, targetFirst) }) {
         var bufferIndex = matchStart
@@ -52,10 +52,10 @@ public struct ReplacingOccurrences<Input>: Parser
       return nil
     }
 
-    while let range = rangeOfNextMatch() {
-      result.append(contentsOf: buffer[currentIndex..<range.lowerBound])
+    while let match = nextMatch() {
+      result.append(contentsOf: buffer[currentIndex..<match.lowerBound])
       result.append(contentsOf: self.replacement)
-      currentIndex = range.upperBound
+      currentIndex = match.upperBound
     }
 
     result.append(contentsOf: buffer[currentIndex...])

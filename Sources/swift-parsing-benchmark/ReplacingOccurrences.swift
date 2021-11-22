@@ -12,13 +12,13 @@ let replacingOccurrencesSuite = BenchmarkSuite(name: "replacingOccurrences") { s
   }
 
 
-  let replacingPlusWithSpace = Many(into: "") { $0 += $1 } forEach :{
-    OneOf {
-      Prefix { $0 != "+" }
-      "+".map { " "[...] }
-    }
-  }
-//
+//  let replacingPlusWithSpace = Many(into: "") { $0 += $1 } forEach :{
+//    OneOf {
+//      Prefix { $0 != "+" }
+//      "+".map { " "[...] }
+//    }
+//  }
+////
 //  suite.benchmark("adhoc") {
 //    var input = input[...]
 //    let output = replacingPlusWithSpace.parse(&input)
