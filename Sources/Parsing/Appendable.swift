@@ -5,9 +5,16 @@ public protocol Appendable {
   mutating func append(contentsOf other: Self)
 }
 
-public protocol AppendableCollection: Appendable {
+public protocol AppendableCollection: Appendable & Collection {
   associatedtype Element
   mutating func append<S: Sequence>(contentsOf elements: S) where S.Element == Element
+}
+
+extension AppendableCollection {
+  public init<S: Sequence>(_ elements: S) where S.Element == Element {
+    self.init()
+    self.append(contentsOf: elements)
+  }
 }
 
 extension Array: AppendableCollection {}

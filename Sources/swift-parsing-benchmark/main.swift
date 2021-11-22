@@ -57,31 +57,10 @@ let appendableSuite = BenchmarkSuite(name: "Appendable") { suite in
   }
 }
 
-//
-// benchmark("Substring") {
-//  var first = string[...]
-//  let second = other[...]
-//  first.append(contentsOf: second)
-//  precondition(first.elementsEqual(combined))
-// }
-//
-// benchmark("Substring.UnicodeScalarView") {
-//  var first = string[...].unicodeScalars
-//  let second = other[...].unicodeScalars
-//  first.append(contentsOf: second)
-//  precondition(first.elementsEqual(combined[...].unicodeScalars))
-// }
-//
-// benchmark("Substring.UTF8View") {
-//  var first = string[...].utf8
-//  let second = other[...].utf8
-//  first.append(contentsOf: second)
-//  precondition(first.elementsEqual(combined[...].utf8))
-// }
+
 
 Benchmark.main(
   [
-    //        stringSuite,
 //    defaultBenchmarkSuite,
 //    appendableSuite,
 //    arithmeticSuite,
@@ -97,10 +76,16 @@ Benchmark.main(
 //    raceSuite,
 //    readmeExampleSuite,
 //    routingSuite,
-    stringAbstractionsSuite,
+//    stringAbstractionsSuite,
 //    uuidSuite,
 //    xcodeLogsSuite,
+//    trimSuite,
+    replacingOccurrencesSuite
   ]
 )
-
-foo()
+//
+//do {
+//  var input = "12345"[...].utf8
+//  let output = Many(Whitespace()).parse(&input)
+//  print(output)
+//}

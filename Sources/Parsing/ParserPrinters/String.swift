@@ -35,20 +35,6 @@ extension String {
   ) -> Parsers.StringParser<Substring.UTF8View> {
     .init()
   }
-
-  @inlinable
-  public static func parser(
-    of inputType: ArraySlice<UInt8>.Type = ArraySlice<UInt8>.self
-  ) -> Parsers.StringParser<ArraySlice<UInt8>> {
-    .init()
-  }
-
-  @inlinable
-  public static func parser(
-    of inputType: Substring.Type = Substring.self
-  ) -> Parsers.SubstringStringParser {
-    .init()
-  }
 }
 
 extension Parsers {
@@ -63,7 +49,13 @@ extension Parsers {
 
     @inlinable
     public func parse(_ input: inout Input) -> String? {
-      String(decoding: input, as: UTF8.self)
+      defer { input.removeFirst(input.count) }
+      if let utf8View = input as? Substring.UTF8View {
+        // is this equivalent to String(decoding:as:)?
+        return String(utf8View) // can it fail? alternatively String(Substring(utf8View))
+      } else {
+        return String(decoding: input, as: UTF8.self)
+      }
     }
   }
 }
@@ -74,27 +66,5 @@ extension Parsers.StringParser: Printer where Input: AppendableCollection {
     var input = Input()
     input.append(contentsOf: output.utf8)
     return input
-  }
-}
-
-extension Parsers {
-  public struct SubstringStringParser: Parser {
-    public let parser: Parsers.StringParser<Substring.UTF8View>
-
-    @inlinable
-    public init() {
-      self.parser = Parsers.StringParser()
-    }
-
-    @inlinable
-    public func parse(_ input: inout Substring) -> String? {
-      self.parser.parse(&input.utf8)
-    }
-  }
-}
-
-extension Parsers.SubstringStringParser: Printer {
-  public func print(_ output: String) -> Substring? {
-    output[...]
   }
 }

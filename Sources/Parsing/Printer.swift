@@ -17,7 +17,7 @@ extension Printer where Output == Void {
 
 // MARK: -
 
-struct User: Equatable, Codable {
+struct User: Equatable {
   var id: Int
   var name: String
   var isAdmin: Bool
