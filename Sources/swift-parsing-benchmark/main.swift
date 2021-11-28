@@ -57,11 +57,9 @@ let appendableSuite = BenchmarkSuite(name: "Appendable") { suite in
   }
 }
 
-
-
 Benchmark.main(
   [
-//    defaultBenchmarkSuite,
+    //    defaultBenchmarkSuite,
 //    appendableSuite,
 //    arithmeticSuite,
 //    binaryDataSuite,
@@ -80,12 +78,14 @@ Benchmark.main(
 //    uuidSuite,
 //    xcodeLogsSuite,
 //    trimSuite,
-    replacingOccurrencesSuite
+//    replacingOccurrencesSuite,
+//    joinSuite,
+    conversionsSuite,
   ]
 )
 //
-//do {
+// do {
 //  var input = "12345"[...].utf8
 //  let output = Many(Whitespace()).parse(&input)
 //  print(output)
-//}
+// }

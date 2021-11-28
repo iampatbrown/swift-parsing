@@ -31,7 +31,10 @@ public func foo() {
     ","
     Bool.parser()
   }
-  .pipe { UnsafeBitCast(User.init(id:name:isAdmin:)) }
+  .convert(apply: User.init(id:name:isAdmin:), unapply: { ($0.id, $0.name, $0.isAdmin) })
+//  .pipe { UnsafeBitCast(User.init(id:name:isAdmin:)) }
+
+
 
   let a = user.parse("1,Blob,true")
   let b = user.print(User(id: 1, name: "Blob", isAdmin: true))
