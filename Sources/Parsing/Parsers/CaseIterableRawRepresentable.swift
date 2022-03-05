@@ -3,7 +3,7 @@ extension CaseIterable where Self: RawRepresentable, RawValue: LosslessStringCon
   /// collection of a substring.
   ///
   /// Given a type that conforms to `CaseIterable` and `RawRepresentable` with a `RawValue` that conforms to
-  /// `LosslessStringConvertible`, we can incrementally parse a value of it.
+  /// `LosslessStringConvertible`, such as `String` and `Int`, we can incrementally parse a value of it.
   ///
   /// Notably, raw enumerations that conform to `CaseIterable` meet this criteria, so cases of the
   /// following type can be parsed with no extra work:
