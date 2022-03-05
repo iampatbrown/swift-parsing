@@ -1,36 +1,9 @@
 extension CaseIterable where Self: RawRepresentable, RawValue: LosslessStringConvertible {
-  @inlinable
-  public static func parser(
-    of inputType: Substring.Type = Substring.self
-  ) -> Parsers.CaseIterableRawRepresentableParser<Substring, Self, String> {
-    .init(toPrefix: { String($0) }, areEquivalent: ==)
-  }
-
-  @inlinable
-  public static func parser(
-    of inputType: Substring.UTF8View.Type = Substring.UTF8View.self
-  ) -> Parsers.CaseIterableRawRepresentableParser<Substring.UTF8View, Self, String.UTF8View> {
-    .init(toPrefix: { String($0).utf8 }, areEquivalent: ==)
-  }
-
-  @inlinable
-  public static func parser<Input>(
-    of inputType: Input.Type = Input.self
-  ) -> Parsers.CaseIterableRawRepresentableParser<Input, Self, String.UTF8View>
-  where
-    Input.SubSequence == Input,
-    Input.Element == UTF8.CodeUnit
-  {
-    .init(toPrefix: { String($0).utf8 }, areEquivalent: ==)
-  }
-}
-
-extension CaseIterable where Self: RawRepresentable, RawValue == String {
   /// A parser that consumes a case-iterable, raw representable value from the beginning of a
   /// collection of a substring.
   ///
-  /// Given a type that conforms to `RawRepresentable` with a `RawValue` of `String`, and
-  /// `CaseIterable`, we can incrementally parse a value of it.
+  /// Given a type that conforms to `CaseIterable` and `RawRepresentable` with a `RawValue` that conforms to
+  /// `LosslessStringConvertible`, we can incrementally parse a value of it.
   ///
   /// Notably, raw enumerations that conform to `CaseIterable` meet this criteria, so cases of the
   /// following type can be parsed with no extra work:
@@ -55,7 +28,7 @@ extension CaseIterable where Self: RawRepresentable, RawValue == String {
   public static func parser(
     of inputType: Substring.Type = Substring.self
   ) -> Parsers.CaseIterableRawRepresentableParser<Substring, Self, String> {
-    .init(toPrefix: { $0 }, areEquivalent: ==)
+    .init(toPrefix: { String($0) }, areEquivalent: ==)
   }
 
   /// A parser that consumes a case-iterable, raw representable value from the beginning of a
@@ -69,7 +42,7 @@ extension CaseIterable where Self: RawRepresentable, RawValue == String {
   public static func parser(
     of inputType: Substring.UTF8View.Type = Substring.UTF8View.self
   ) -> Parsers.CaseIterableRawRepresentableParser<Substring.UTF8View, Self, String.UTF8View> {
-    .init(toPrefix: { $0.utf8 }, areEquivalent: ==)
+    .init(toPrefix: { String($0).utf8 }, areEquivalent: ==)
   }
 
   /// A parser that consumes a case-iterable, raw representable value from the beginning of a
@@ -86,7 +59,7 @@ extension CaseIterable where Self: RawRepresentable, RawValue == String {
     Input.SubSequence == Input,
     Input.Element == UTF8.CodeUnit
   {
-    .init(toPrefix: { $0.utf8 }, areEquivalent: ==)
+    .init(toPrefix: { String($0).utf8 }, areEquivalent: ==)
   }
 }
 
