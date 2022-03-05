@@ -1,4 +1,4 @@
-extension CaseIterable where Self: RawRepresentable, RawValue == Int {
+extension CaseIterable where Self: RawRepresentable, RawValue: LosslessStringConvertible {
   @inlinable
   public static func parser(
     of inputType: Substring.Type = Substring.self
@@ -96,7 +96,6 @@ extension Parsers {
   >: Parser
   where
     Input.SubSequence == Input,
-    Output.RawValue: Comparable,
     Prefix.Element == Input.Element
   {
     @usableFromInline
@@ -115,7 +114,9 @@ extension Parsers {
     ) {
       self.toPrefix = toPrefix
       self.areEquivalent = areEquivalent
-      self.cases = Output.allCases.sorted(by: { $0.rawValue > $1.rawValue })
+      self.cases = Output.allCases.sorted(by: {
+        toPrefix($0.rawValue).endIndex > toPrefix($1.rawValue).endIndex
+      })
     }
 
     @inlinable
