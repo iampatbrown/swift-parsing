@@ -88,7 +88,7 @@ extension Parsers {
       self.toPrefix = toPrefix
       self.areEquivalent = areEquivalent
       self.cases = Output.allCases
-        .sorted(by: { toPrefix($0.rawValue).endIndex > toPrefix($1.rawValue).endIndex })
+        .sorted(by: { toPrefix($0.rawValue).count > toPrefix($1.rawValue).count })
     }
 
     @inlinable
